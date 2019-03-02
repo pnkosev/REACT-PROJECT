@@ -21,9 +21,10 @@ module.exports = {
 	isAuth: (req, res, next) => {
 
 		const authHeaders = req.get('Authorization');
+		
 		if (!authHeaders) {
 			return res.status(401)
-				.json({ message: 'Not authenticated.' });
+				.json({ message: 'You have to be authenticated to have access.' });
 		}
 
 		verifyToken(req)

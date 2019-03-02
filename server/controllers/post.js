@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator/check');
 const Post = require('../models/Post');
 const User = require('../models/User');
+const Comment = require('../models/Comment');
 
 function validatePost(req, res) {
 	const errors = validationResult(req);
@@ -12,7 +13,6 @@ function validatePost(req, res) {
 
 		return false;
 	}
-
 	return true;
 }
 
@@ -36,19 +36,15 @@ module.exports = {
 				next(error);
 			});
 	},
-	createPost: (req, res, next) => {
-		// Validate post using express-validator
-		// Return 422 with errors array if something went wrong
+	postCreatePost: (req, res, next) => {
 		if (validatePost(req, res)) {
 			const { title, content } = req.body;
 
-			// Create the post in DB and return 201 status code with a message and the post itself with the creator
 			const post = new Post({
 				title,
 				content,
 				creator: req.userId
 			});
-			let creator;
 
 			post.save()
 				.then(() => {
@@ -56,7 +52,6 @@ module.exports = {
 				})
 				.then((user) => {
 					user.posts.push(post);
-					creator = user;
 					return user.save();
 				})
 				.then(() => {
@@ -80,20 +75,25 @@ module.exports = {
 		const postId = req.params.postId;
 
 		Post.findById(postId)
-			.then((post) => {
+			.then(async (post) => {
 				if (!post) {
 					const error = new Error('Post not found!');
 					error.statusCode = 404;
 					throw error;
 				}
 
-				if (post.creator.toString() !== req.userId) {
+				const user = await User.findById(req.userId);
+
+				if ((post.creator.toString() !== req.userId) && (user.roles.indexOf('Admin') < 0)) {
 					const error = new Error('Unauthorized');
 					error.statusCode = 403;
 					throw error;
 				}
 
-				return Post.findByIdAndDelete(postId);
+				return Promise.all([
+					Post.findByIdAndDelete(postId),
+					Comment.deleteMany({post: postId})
+				]);
 			})
 			.then(() => {
 				return User.findById(req.userId);
@@ -119,8 +119,19 @@ module.exports = {
 	getPostById: (req, res, next) => {
 		const postId = req.params.postId;
 
-		Post.findById(postId)
+		Post
+			.findById(postId)
+			.populate('comments')
+			//.where('status', 'Approved')
+			.populate('likes')
+			.populate('hates')
 			.then((post) => {
+				if (!post) {
+					const error = new Error('Post not found!');
+					error.statusCode = 404;
+					throw error;
+				}
+				
 				res
 					.status(200)
 					.json({
@@ -141,24 +152,26 @@ module.exports = {
 		// Return 422 with errors array if something went wrong
 		if (validatePost(req, res)) {
 			const postId = req.params.postId;
-			const post = req.body;
+			const { title, content } = req.body;
 
 			Post.findById(postId)
-				.then((p) => {
+				.then(async (p) => {
 					if (!p) {
 						const error = new Error('Post not found');
 						error.statusCode = 404;
 						throw error;
 					}
 
-					if (p.creator.toString() !== req.userId) {
+					const user = await User.findById(req.userId);
+
+					if ((p.creator.toString() !== req.userId) && (user.roles.indexOf('Admin') < 0)) {
 						const error = new Error('Unauthorized');
 						error.statusCode = 403;
 						throw error;
 					}
 
-					p.title = post.title;
-					p.content = post.content;
+					p.title = title;
+					p.content = content;
 
 					return p.save();
 				})

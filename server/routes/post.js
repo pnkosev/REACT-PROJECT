@@ -3,7 +3,7 @@ const { body } = require('express-validator/check');
 const feedController = require('../controllers/post');
 const { isAuth, isInRole } = require('../middleware/is-auth');
 
-router.get('/all', isAuth, feedController.getPosts);
+router.get('/all', feedController.getPosts);
 router.post('/create', isAuth, [
   body('title')
     .trim()
@@ -11,9 +11,9 @@ router.post('/create', isAuth, [
   body('content')
     .trim()
     .isLength({ min: 5 })
-], feedController.createPost);
-router.get('/:postId', isAuth,feedController.getPostById);
-router.put('/update/:postId', isAuth,feedController.updatePost);
-router.delete('/delete/:postId', isAuth,feedController.deletePost);
+], feedController.postCreatePost);
+router.get('/:postId', feedController.getPostById);
+router.put('/update/:postId', isAuth || isInRole('Admin'), feedController.updatePost);
+router.delete('/delete/:postId', isAuth || isInRole('Admin'), feedController.deletePost);
 
 module.exports = router;

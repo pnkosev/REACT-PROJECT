@@ -1,16 +1,14 @@
 const router = require('express').Router();
-// const languageController = require('../controllers/language');
-// const translationController = require('../controllers/translation');
-// const isAuth = require('../middleware/is-auth');
+const commentController = require('../controllers/comment');
+const { isAuth, isInRole } = require('../middleware/is-auth');
 
-// router.get('/language/all', languageController.getAllLanguages);
-// router.post('/language/create', languageController.postCreateLanguage);
-// //router.put('/language/update/:langId', languageController.updateLanguage);
+router.post('/:postId/create', isAuth, commentController.postCreateComment);
+router.get('/get/:commentId', isAuth, commentController.getCommentById);
 
-// router.get('/words', translationController.getAllWords);
-// router.get('/translation/allPending', translationController.getPendingTranslations);
-// router.post('/translation/create', isAuth, translationController.postCreateTranslation);
-// router.put('/translation/update/:transId', translationController.updateTranslation);
-// router.delete('/translation/delete/:transId', translationController.deleteTranslation);
+router.put('/update/:commentId', isAuth || isInRole('Admin'), commentController.updateComment);
+router.delete('/delete/:commentId', isAuth || isInRole('Admin'), commentController.deleteComment);
+
+router.get('/pending', isInRole('Admin'), commentController.getPendingComments);
+router.put('/approve/:commentId', isInRole('Admin'), commentController.approveComment);
 
 module.exports = router;
