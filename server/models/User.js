@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
+const { Schema, model } = require('mongoose');
 const encryption = require('../util/encryption');
-const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  email: { type: Schema.Types.String, required: true },
-  hashedPassword: { type: Schema.Types.String, required: true },
-  name: { type: Schema.Types.String, required: true },
+  username: { type: Schema.Types.String, required: true },
   salt: { type: Schema.Types.String, required: true },
-  translations: [{ type: Schema.Types.ObjectId, ref: 'Word' }],
+  hashedPassword: { type: Schema.Types.String, required: true },
+  email: { type: Schema.Types.String, required: true },
+  posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
+  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   roles: [{ type: Schema.Types.String }]
 });
 
@@ -19,7 +19,7 @@ userSchema.method({
   }
 })
 
-const User = mongoose.model('User', userSchema);
+const User = model('User', userSchema);
 
 User.seedAdminUser = async () => {
   try {
@@ -28,11 +28,12 @@ User.seedAdminUser = async () => {
       const salt = encryption.generateSalt();
       const hashedPassword = encryption.generateHashedPassword(salt, '123');
       return User.create({
-          email: 'admin@adminov.com',
+          username: 'admin',
           salt,
           hashedPassword,
-          name: 'PN',
-          words: [],
+          email: 'admin@adminov.com',
+          posts: [],
+          comments: [],
           roles: ['Admin']
       });
   } catch (e) {

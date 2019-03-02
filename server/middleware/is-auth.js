@@ -1,29 +1,68 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 
-module.exports = (req, res, next) => {
-  const authHeaders = req.get('Authorization');
-  if (!authHeaders) {
-    return res.status(401)
-      .json({ message: 'Not authenticated.' })
-  }
+function verifyToken(req, res) {
+	const token = req.get('Authorization').split(' ')[1];
+	return new Promise((res, rej) => {
+		jwt.verify(token, config.JWTSecret, (err, decodedToken) => {
+			if (err) {
+				rej();
+			}
+			req.userId = decodedToken.userId;
+			res();
+		})
+	})
+}
 
-  const token = req.get('Authorization').split(' ')[1];
-  let decodedToken;
-  try {
-    decodedToken = jwt.verify(token, config.JWTSecret)
-  } catch(error) {
-    return res.status(401)
-      .json({ message: 'Token is invalid.', error });
-  }
+module.exports = {
+	isAuth: (req, res, next) => {
 
-  if (!decodedToken) {
-    return res.status(401)
-      .json({ message: 'Not authenticated.' });
-  }
+		const authHeaders = req.get('Authorization');
+		if (!authHeaders) {
+			return res.status(401)
+				.json({ message: 'Not authenticated.' });
+		}
 
-  req.userId = decodedToken.userId;
-  next();
+		verifyToken(req)
+			.then(() => {
+				next();
+			})
+			.catch(() => {
+				return res.status(401).json({
+				  message: 'Token verification failed!'
+				});
+			});
+	},
+	isInRole: (role) => {
+		return (req, res, next) => {
+			if (req.headers.authorization) {
+				verifyToken(req)
+					.then(() => {
+						User.findById(req.userId).then((user) => {
+							let isInRole = user.roles.indexOf(role) !== -1;
+	
+							if (isInRole) {
+								next();
+							} else {
+								return res.status(401).json({
+									message: 'You need to be an admin to access this!'
+								});
+							}
+						})
+					})
+					.catch(() => {
+						return res.status(401).json({
+						message: 'Token verification failed!'
+						});
+					});
+			} else {
+				return res.status(401).json({
+					message: 'You need to be logged in to access this!'
+				});
+			}
+		};
+	}
 }

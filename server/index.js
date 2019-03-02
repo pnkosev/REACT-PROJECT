@@ -1,8 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
-const dictionaryRoutes = require('./routes/dictionary');
+const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
 
 const env = process.env.NODE_ENV || 'development';
 const config = require('./config/config')[env];
@@ -19,9 +19,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/feed', feedRoutes);
 app.use('/user', authRoutes);
-app.use('/dictionary', dictionaryRoutes);
+app.use('/post', postRoutes);
+app.use('/comment', commentRoutes);
 
 // General error handling
 app.use((error, req, res, next) => {
