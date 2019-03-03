@@ -6,18 +6,16 @@ const encryption = require('../util/encryption');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 
-
 function validateUser(req, res) {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		res.status(422).json({
+			success: false,
 			message: 'Validation failed, entered data is incorrect',
 			errors: errors.array()
 		});
-
 		return false;
 	}
-
 	return true;
 }
 
@@ -27,9 +25,14 @@ module.exports = {
 			const { username, email, password } = req.body;
 			const salt = encryption.generateSalt();
 			const hashedPassword = encryption.generateHashedPassword(salt, password);
-			
+
 			User
-				.create({ username, email, salt, hashedPassword})
+				.create({
+					username,
+					email,
+					salt,
+					hashedPassword
+				})
 				.then((user) => {
 
 					const token = jwt.sign({
@@ -41,6 +44,7 @@ module.exports = {
 
 					res.status(201)
 						.json({
+							success: true,
 							message: `User created successfully! Welcome, ${user.username}!`,
 							token,
 							userId: user._id,
@@ -58,7 +62,10 @@ module.exports = {
 		}
 	},
 	login: (req, res, next) => {
-		const { username, password } = req.body;
+		const {
+			username,
+			password
+		} = req.body;
 
 		User
 			.findOne({
@@ -85,6 +92,7 @@ module.exports = {
 				});
 
 				res.status(200).json({
+					success: true,
 					message: `You have successfully logged in, ${user.username}!`,
 					token,
 					userId: user._id.toString(),
