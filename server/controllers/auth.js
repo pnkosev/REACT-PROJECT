@@ -24,12 +24,12 @@ function validateUser(req, res) {
 module.exports = {
 	register: (req, res, next) => {
 		if (validateUser(req, res)) {
-			const { username, password, email } = req.body;
+			const { username, email, password } = req.body;
 			const salt = encryption.generateSalt();
 			const hashedPassword = encryption.generateHashedPassword(salt, password);
 			
 			User
-				.create({ username, salt, hashedPassword, email })
+				.create({ username, email, salt, hashedPassword})
 				.then((user) => {
 
 					const token = jwt.sign({
@@ -89,6 +89,7 @@ module.exports = {
 					token,
 					userId: user._id.toString(),
 					username: user.username,
+					isAdmin: user.roles.indexOf('Admin') !== -1,
 				});
 			})
 			.catch(error => {

@@ -5,15 +5,8 @@ const User = require('../models/User');
 
 router.post('/register', 
   [
-    // TODO: Add normalize email and check
-    body('email')
-      .isEmail()
-      .withMessage('Please enter a valid email.'),
-    body('password')
-      .trim()
-      .isLength({ min: 3 })
-      .withMessage('Please enter a valid password.'),
-    body('username')
+	// TODO: Add normalize email and check
+	body('username')
       .trim()
       .not()
       .isEmpty()
@@ -24,7 +17,14 @@ router.post('/register',
             return Promise.reject('Username already exists!');
           }
         })
-      })
+      }),
+    body('email')
+      .isEmail()
+      .withMessage('Please enter a valid email.'),
+    body('password')
+      .trim()
+      .isLength({ min: 3 })
+      .withMessage('Please enter a valid password.'),
   ]
 , authController.register);
 router.post('/login', authController.login);
