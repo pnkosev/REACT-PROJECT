@@ -12,11 +12,11 @@ function notify(type, message, errors) {
         toastr.error(message);
 
         if (errors) {
-            for (let err in errors) {
-                toastr.error(errors[err]);
-            }
+            Object.keys(errors).forEach(e => {
+                toastr.error(errors[e]);
+            });
         }
     }
 }
 
-export {notify};
+export default notify;
