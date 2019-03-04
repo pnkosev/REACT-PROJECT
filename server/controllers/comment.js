@@ -7,6 +7,7 @@ function validateComment(req, res) {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		res.status(422).json({
+			success: false,
 			message: 'Validation failed, entered data is incorrect',
 			errors: errors.array()
 		});
@@ -44,8 +45,9 @@ module.exports = {
 					res
 						.status(201)
 						.json({
+							success: true,
 							message: 'Comment created successfully!',
-							comment: comment,
+							comment,
 						})
 				})
 				.catch((error) => {
@@ -66,6 +68,7 @@ module.exports = {
 				res
 					.status(200)
 					.json({
+						success: true,
 						message: 'Comment fetched.',
 						comment
 					})
@@ -109,6 +112,7 @@ module.exports = {
 				.then((comment) => {
 					if (comment) {
 						res.status(200).json({
+							success: true,
 							message: 'Comment updated!',
 							comment
 						})
@@ -157,6 +161,7 @@ module.exports = {
 			.then(() => {
 				res.status(200)
 					.json({
+						success: true,
 						message: 'Comment deleted successfully!'
 					})
 			})
@@ -176,6 +181,7 @@ module.exports = {
                 res
 					.status(200)
 					.json({
+						success: true,
 						message: 'Comments fetched.',
 						comments
 					})
@@ -206,6 +212,7 @@ module.exports = {
                 res
                     .status(200)
                     .json({
+						success: true,
                         message: 'Comment approved!',
                         comment
                 })

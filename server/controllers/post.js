@@ -7,6 +7,7 @@ function validatePost(req, res) {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		res.status(422).json({
+			success: false,
 			message: 'Validation failed, entered data is incorrect',
 			errors: errors.array()
 		});
@@ -24,6 +25,7 @@ module.exports = {
 				res
 					.status(200)
 					.json({
+						success: true,
 						message: 'Fetched posts successfully.',
 						posts
 					});
@@ -58,6 +60,7 @@ module.exports = {
 					res
 						.status(201)
 						.json({
+							success: true,
 							message: 'Post created successfully!',
 							post: post,
 						})
@@ -105,6 +108,7 @@ module.exports = {
 			.then(() => {
 				res.status(200)
 					.json({
+						success: true,
 						message: 'Post deleted successfully!'
 					})
 			})
@@ -135,6 +139,7 @@ module.exports = {
 				res
 					.status(200)
 					.json({
+						success: true,
 						message: 'Post fetched.',
 						post
 					})
@@ -154,7 +159,8 @@ module.exports = {
 			const postId = req.params.postId;
 			const { title, content } = req.body;
 
-			Post.findById(postId)
+			Post
+				.findById(postId)
 				.then(async (p) => {
 					if (!p) {
 						const error = new Error('Post not found');
@@ -175,11 +181,12 @@ module.exports = {
 
 					return p.save();
 				})
-				.then((p) => {
-					if (p) {
+				.then((post) => {
+					if (post) {
 						res.status(200).json({
+							success: true,
 							message: 'Post updated!',
-							post: p
+							post
 						})
 					}
 				})
