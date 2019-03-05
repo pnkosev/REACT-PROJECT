@@ -1,6 +1,7 @@
 import React from 'react';
 import Input from '../common/Input';
 import withForm from '../hocs/WithForm';
+import userLoginModel from '../../helpers/models/userLoginModel';
 
 // class Login extends Component {
 //     constructor(props) {
@@ -83,12 +84,14 @@ const LoginBase = (props) => {
             <h1>Login</h1>
             <form onSubmit={props.handleFormSubmit}>
                 <Input
+                    inputType={true}
                     name="username"
                     value={props.username}
                     onChange={props.handleChange}
                     label="Username"
                 />
                 <Input
+                    inputType={true}
                     name="password"
                     type="password"
                     value={props.password}
@@ -102,5 +105,5 @@ const LoginBase = (props) => {
     );
 }
 
-const WithFormLogin = withForm(LoginBase);
+const WithFormLogin = withForm(LoginBase, userLoginModel);
 export default WithFormLogin;

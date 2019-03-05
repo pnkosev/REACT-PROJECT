@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 
 import notify from '../../helpers/notifier';
 
-const withForm = (WrappedComponent) =>
+const withForm = (WrappedComponent, model) =>
     class WithForm extends Component {
         constructor(props) {
             super(props);
 
             this.state = {
+                ...model.defaultState,
                 error: {}
             };
 
@@ -31,54 +32,54 @@ const withForm = (WrappedComponent) =>
                 return object;
             }, {});
 
-
             let validationResult = this.props.validateForm(credentials);
-
+            
             if (!validationResult.success) {
                 notify('error', validationResult.message, validationResult.errors);
                 return;
             }
-            
-            const res = await this.props.postRequest(credentials);
-    
-            if (!res.success) {
-                this.setState({ error: res.message });
-                notify('error', this.state.error);
-                return;
-            } else {
-                if(res.token) {
-                    localStorage.setItem('authToken', res.token);
-                }
-                if(res.username) {
-                    localStorage.setItem('username', res.username);
-                }
-                if(res.userId) {
-                    localStorage.setItem('userId', res.userId);
-                }
-                if(res.isAdmin) {
-                    localStorage.setItem('isAdmin', res.isAdmin);
-                }
-    
-                notify('success', res.message);
 
-                this.props.history.push('/');
+            try {
+                const res = await this.props.request(credentials);
+    
+                if (!res.success) {
+                    const errors = (res.errors).reduce((obj, key) => {
+                        obj[key['param']] = key['msg']
+                        return obj;
+                    }, {})
+
+                    this.setState({ error: errors });
+                    notify('error','Invalid input', errors);
+                    return;
+                    //throw new Error(errors)
+                } else {
+                    if(res.token) {
+                        localStorage.setItem('authToken', res.token);
+                        localStorage.setItem('username', res.username);
+                        localStorage.setItem('userId', res.userId);
+                        localStorage.setItem('isAdmin', res.isAdmin);
+                    }
+                    notify('success', res.message);
+                    this.props.history.push('/');
+                }
+            }
+            catch(err) {
+                console.log(err);
             }
         }
 
-        componentDidMount() {
-            const isLoggedIn = localStorage.getItem('authToken') !== false;
-
-            if (isLoggedIn) {
-                this.props.history.push('/');
-            }
-        }
+        // componentDidMount() {
+        //     const isLoggedIn = localStorage.getItem('authToken') !== null;
+        //     if (isLoggedIn) {
+        //         this.props.history.push('/');
+        //     }
+        // }
 
         render() {
             return (
                 <WrappedComponent
                     handleChange={this.handleChange}
                     handleFormSubmit={this.handleFormSubmit}
-                    error={this.state.error}
                 />
             );
         }

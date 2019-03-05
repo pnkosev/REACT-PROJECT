@@ -31,7 +31,8 @@ module.exports = {
 					username,
 					email,
 					salt,
-					hashedPassword
+					hashedPassword,
+					roles: ['User']
 				})
 				.then((user) => {
 
@@ -56,56 +57,54 @@ module.exports = {
 					if (!error.statusCode) {
 						error.statusCode = 500;
 					}
-
 					next(error);
 				});
 		}
 	},
 	login: (req, res, next) => {
-		const {
-			username,
-			password
-		} = req.body;
+		const { username, password } = req.body;
 
-		User
-			.findOne({
-				username
-			})
-			.then((user) => {
-				if (!user) {
-					const error = new Error('Invalid username OR/AND password');
-					error.statusCode = 401;
-					throw error;
-				}
+		if (validateUser(req, res)) {
+			User
+				.findOne({
+					username
+				})
+				.then((user) => {
+					if (!user) {
+						const error = new Error('Invalid username OR/AND password');
+						error.statusCode = 401;
+						throw error;
+					}
 
-				if (!user.authenticate(password)) {
-					const error = new Error('Invalid username OR/AND password');
-					error.statusCode = 401;
-					throw error;
-				}
+					if (!user.authenticate(password)) {
+						const error = new Error('Invalid username OR/AND password');
+						error.statusCode = 401;
+						throw error;
+					}
 
-				const token = jwt.sign({
-					username: user.username,
-					userId: user._id.toString()
-				}, config.JWTSecret, {
-					expiresIn: '1h'
-				});
+					const token = jwt.sign({
+						username: user.username,
+						userId: user._id.toString()
+					}, config.JWTSecret, {
+						expiresIn: '1h'
+					});
 
-				res.status(200).json({
-					success: true,
-					message: `You have successfully logged in, ${user.username}!`,
-					token,
-					userId: user._id.toString(),
-					username: user.username,
-					isAdmin: user.roles.indexOf('Admin') !== -1,
-				});
-			})
-			.catch(error => {
-				if (!error.statusCode) {
-					error.statusCode = 500;
-				}
+					res.status(200).json({
+						success: true,
+						message: `You have successfully logged in, ${user.username}!`,
+						token,
+						userId: user._id.toString(),
+						username: user.username,
+						isAdmin: user.roles.indexOf('Admin') !== -1,
+					});
+				})
+				.catch(error => {
+					if (!error.statusCode) {
+						error.statusCode = 500;
+					}
 
-				next(error);
-			})
+					next(error);
+				})
+		}
 	}
 }

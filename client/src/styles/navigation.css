@@ -1,0 +1,50 @@
+body header {
+    border-bottom: 2px solid black;
+    flex-wrap: wrap;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: block;
+    list-style: none outside;
+    margin: 0.5rem;
+    flex: 1 0 auto;
+}
+
+nav ul li a {
+    display: block;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    background: rgb(150, 0, 150);
+    color: rgb(255, 255, 255);
+    border-radius: 0.3rem; 
+}
+
+nav ul li a:focus,
+nav ul li a:hover {
+    background: rgb(255, 255, 255);
+    color: rgb(150, 0, 150);
+}
+
+.title {
+    font-size: 2rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 1rem 0;
+}
+
+.welcome-msg {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 1rem 0;
+}

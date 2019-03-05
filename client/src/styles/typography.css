@@ -1,0 +1,89 @@
+body {
+    font-size: 16px;
+    line-height: 1.2;
+    font-family: "Helvetica", sans-serif;
+    padding: 4rem;
+    background: rgb(238, 238, 238);
+    min-height: 100vh;
+    margin: 0;
+}
+
+body > div#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Georgia", sans-serif;
+    margin: 1em 0 0.5em 0;
+    padding: 0;
+}
+
+h1 {font-size: 2.2rem}
+h2 {font-size: 2.0rem}
+h3 {font-size: 1.8rem}
+h4 {font-size: 1.6rem}
+h5 {font-size: 1.4rem}
+h6 {font-size: 1.2rem}
+
+p {
+    margin: 0;
+    padding-bottom: 1.5rem;
+}
+
+ul li, ol li {
+    list-style-position: inside;
+}
+
+ol, ul, dl {
+    margin: 0 0 1.5rem 0;
+}
+
+ul ul {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+ul.a {list-style-type: square;}
+ul.b {list-style-type: disc;}
+ul.c {list-style-type: circle;}
+
+blockquote {
+    font-family: "Georgia", sans-serif;
+    border-left: 4px solid rgb(221, 221, 221);
+    font-style: italic;
+    margin: 0 0 1.5rem 2rem;
+    padding: 1rem 2rem;
+}
+
+blockquote .author {
+    text-align:  right;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+    border: 1px solid #CCC;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+table td, table th {
+    border: 1px solid #CCC;
+    padding: 0.3rem 0.5rem;
+}
+
+table th {
+    text-align: left;
+    background: #EEE;
+}
+
+table tr:nth-child(odd) td {
+    background: #F8F8F8;
+}
+
+table tr:hover td {
+    background: black;
+    color: #FFF;
+}

@@ -1,10 +1,9 @@
 import React from 'react';
+import '../../styles/footer.css';
 
 const Footer = () => {
         return (
-            <div>
-                <footer id="footer" className="page-footer mt-4">© Blog Project {new Date().getFullYear()}</footer>
-            </div>
+            <footer id="footer" className="page-footer mt-4">© Blog Project {new Date().getFullYear()}</footer>
         );
 }
 

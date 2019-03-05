@@ -1,6 +1,7 @@
 import React from 'react';
 import Input from '../common/Input';
 import withForm from '../hocs/WithForm';
+import userRegisterModel from '../../helpers/models/userRegisterModel'
 
 // class Register extends Component {
 //     constructor(props) {
@@ -94,18 +95,21 @@ const RegisterBase = (props) => {
             <h1>Register</h1>
             <form onSubmit={props.handleFormSubmit}>
                 <Input
+                    inputType={true}
                     name="username"
                     value={props.username}
                     onChange={props.handleChange}
                     label="Username"
                 />
                 <Input
+                    inputType={true}
                     name="email"
                     value={props.email}
                     onChange={props.handleChange}
                     label="E-mail"
                 />
                 <Input
+                    inputType={true}
                     name="password"
                     type="password"
                     value={props.password}
@@ -113,6 +117,7 @@ const RegisterBase = (props) => {
                     label="Password"
                 />
                 <Input
+                    inputType={true}
                     name="repeat"
                     type="password"
                     value={props.repeat}
@@ -126,7 +131,7 @@ const RegisterBase = (props) => {
     );
 }
 
-const WithFormRegister = withForm(RegisterBase);
+const WithFormRegister = withForm(RegisterBase, userRegisterModel);
 export default WithFormRegister;
 
 //export default withRouter(Register);

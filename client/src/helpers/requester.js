@@ -26,4 +26,4 @@ function request(method) {
 export const get = request('get');
 export const post = request('post');
 export const put = request('put');
-export const remove = request('remove');
+export const remove = request('delete');

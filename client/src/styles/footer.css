@@ -1,0 +1,7 @@
+div > footer {
+    background: rgb(150, 0, 150);
+    color: wheat;
+    padding: 0.5rem 1rem;
+    border-radius: 0.2rem;
+    margin-top: auto;
+}

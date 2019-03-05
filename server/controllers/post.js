@@ -129,6 +129,7 @@ module.exports = {
 			//.where('status', 'Approved')
 			.populate('likes')
 			.populate('hates')
+			.populate('creator')
 			.then((post) => {
 				if (!post) {
 					const error = new Error('Post not found!');

@@ -1,10 +1,10 @@
 const router = require('express').Router();
 const { body } = require('express-validator/check');
 
-const feedController = require('../controllers/post');
+const postController = require('../controllers/post');
 const { isAuth, isInRole } = require('../middleware/is-auth');
 
-router.get('/all', feedController.getPosts);
+router.get('/all', postController.getPosts);
 
 router.post('/create', isAuth, [
   body('title')
@@ -18,10 +18,10 @@ router.post('/create', isAuth, [
     .isLength({ min: 50 })
     .withMessage('Please enter a valid content- minimum 50 chararcters.'),
 ], 
-feedController.postCreatePost);
+postController.postCreatePost);
 
-router.get('/:postId', feedController.getPostById);
-router.put('/update/:postId', isAuth || isInRole('Admin'), feedController.updatePost);
-router.delete('/delete/:postId', isAuth || isInRole('Admin'), feedController.deletePost);
+router.get('/:postId', isAuth, postController.getPostById);
+router.put('/update/:postId', isAuth || isInRole('Admin'), postController.updatePost);
+router.delete('/delete/:postId', isAuth || isInRole('Admin'), postController.deletePost);
 
 module.exports = router;
