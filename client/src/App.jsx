@@ -3,6 +3,8 @@ import { Route, Switch, withRouter } from 'react-router-dom';
 import toastr from 'toastr';
 
 import './styles/typography.css'
+
+import PrivateRoute from './components/common/PrivateRoute';
 import Home from './components/views/Home';
 import NotFound from './components/views/NotFound';
 import Header from './components/common/Header';
@@ -11,13 +13,15 @@ import PostDetails from './components/views/PostDetails';
 
 import { postRegister, postLogin } from './services/auth';
 import PostService from './services/post';
+
 import validateRegisterForm from './helpers/formValidators/registerFormValidator'
 import validateLoginForm from './helpers/formValidators/loginFormValidator';
 import validateCreatePostForm from './helpers/formValidators/createPostValidator';
 import WithFormRegister from './components/forms/Register';
 import WithFormLogin from './components/forms/Login';
 import WithFormCreatePost from './components/forms/CreatePost';
-import WithFormUpdatePost from './components/forms/EditPost';
+import EditPost from './components/forms/EditPost';
+import CommentsPending from './components/views/CommentsPending';
 
 toastr.options.newestOnTop = false;
 toastr.options.closeButton = true;
@@ -26,55 +30,53 @@ class App extends Component {
 	constructor(props) {
         super(props);
 
-        this.state = {
-			isLoggedIn: false,
-			username: '',
-		};
+        // this.state = {
+		// 	isLoggedIn: false,
+		// 	username: '',
+		// };
 		
 		this.onLogout = this.onLogout.bind(this);
 	}
 
-	static service = new PostService();
+	static postService = new PostService();
 
 	onLogout(e) {
 		e.preventDefault();
 		localStorage.clear();
-		this.setState({
-			isLoggedIn: false,
-			username: ''
-		})
+		// this.setState({
+		// 	isLoggedIn: false,
+		// 	username: ''
+		// })
 		this.props.history.push('/');
 	}
 	
-	componentDidMount() {
-		const user = localStorage.getItem('authToken') !== null ? true : false;
-		const username = localStorage.getItem('username');
+	// componentDidMount() {
+	// 	const user = localStorage.getItem('authToken') !== null ? true : false;
+	// 	const username = localStorage.getItem('username');
 		
-		if (user) {
-			this.setState({
-				isLoggedIn: true,
-				username
-			})
-		}
-	}
+	// 	if (user) {
+	// 		this.setState({
+	// 			isLoggedIn: true,
+	// 			username
+	// 		})
+	// 	}
+	// }
 
+	
 	render() {
 		return (
 			<Fragment>
 				<Header 
 					isLoggedIn={localStorage.getItem('authToken') !== null} 
-					username={localStorage.getItem('username')} 
-					onLogout={this.onLogout} />
+					username={localStorage.getItem('username')}
+					isAdmin={(localStorage.getItem('isAdmin') === 'true')}
+					onLogout={this.onLogout}
+				/>
 				<Switch>
-					<Route path="/" exact render={(props) =>
-						<Home 
-							{...props}
-							isLoggedIn={localStorage.getItem('authToken') !== null} 
-						/>
-					} />
+					<Route path="/" exact component={Home} />
 					<Route path="/user/register" exact render={(props) => 
 						<WithFormRegister
-							postRequest={postRegister}
+							request={postRegister}
 							validateForm={validateRegisterForm}
 							{...props}
 						/>
@@ -86,9 +88,9 @@ class App extends Component {
 							{...props}
 						/>
 					} />
-					<Route path="/post/create" exact render={(props) => 
+					<PrivateRoute path="/post/create" exact render={(props) => 
 						<WithFormCreatePost
-							request={App.service.postCreate}
+							request={App.postService.postCreate}
 							validateForm={validateCreatePostForm}
 							{...props}
 						/>
@@ -98,13 +100,14 @@ class App extends Component {
 							{...props}
 						/>
 					} />
-					<Route path="/post/update/:postId" exact render={(props) => 
-						<WithFormUpdatePost
-							getById={App.service.getById}
-							request={App.service.update}
+					<PrivateRoute path="/post/update/:postId" exact render={(props) => 
+						<EditPost
 							validateForm={validateCreatePostForm}
 							{...props}
 						/>
+					} />
+					<PrivateRoute path="/comment/pending" exact render={(props) => 
+						<CommentsPending {...props}/>
 					} />
 					<Route component={NotFound} />
 				</Switch>

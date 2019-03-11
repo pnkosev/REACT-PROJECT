@@ -19,13 +19,10 @@ function validateComment(req, res) {
 
 module.exports = {
 	postCreateComment: (req, res, next) => {
-		// Validate post using express-validator
-		// Return 422 with errors array if something went wrong
 		if (validateComment(req, res)) {
-            const postId = req.params.postId;
+			const postId = req.params.postId;
 			const { content } = req.body;
 
-			// Create the post in DB and return 201 status code with a message and the post itself with the creator
 			const comment = new Comment({
 				content,
                 creator: req.userId,
@@ -46,7 +43,7 @@ module.exports = {
 						.status(201)
 						.json({
 							success: true,
-							message: 'Comment created successfully!',
+							message: 'Comment created successfully! It will be visible right after the approval of our Admins!',
 							comment,
 						})
 				})

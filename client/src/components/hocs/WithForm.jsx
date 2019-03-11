@@ -33,7 +33,7 @@ const withForm = (WrappedComponent, model) =>
             }, {});
 
             let validationResult = this.props.validateForm(credentials);
-            
+
             if (!validationResult.success) {
                 notify('error', validationResult.message, validationResult.errors);
                 return;
@@ -41,19 +41,23 @@ const withForm = (WrappedComponent, model) =>
 
             try {
                 const res = await this.props.request(credentials);
-    
-                if (!res.success) {
-                    const errors = (res.errors).reduce((obj, key) => {
-                        obj[key['param']] = key['msg']
-                        return obj;
-                    }, {})
 
-                    this.setState({ error: errors });
-                    notify('error','Invalid input', errors);
-                    return;
-                    //throw new Error(errors)
+                if (!res.success) {
+                    if (res.errors) {
+                        const errors = (res.errors).reduce((obj, key) => {
+                            obj[key['param']] = key['msg']
+                            return obj;
+                        }, {})
+        
+                        this.setState({ error: errors });
+                        notify('error', 'Invalid input', errors);
+                        return;
+                    } else {
+                        notify('error', res.message);
+                        return;
+                    }
                 } else {
-                    if(res.token) {
+                    if (res.token) {
                         localStorage.setItem('authToken', res.token);
                         localStorage.setItem('username', res.username);
                         localStorage.setItem('userId', res.userId);
@@ -63,17 +67,10 @@ const withForm = (WrappedComponent, model) =>
                     this.props.history.push('/');
                 }
             }
-            catch(err) {
+            catch (err) {
                 console.log(err);
             }
         }
-
-        // componentDidMount() {
-        //     const isLoggedIn = localStorage.getItem('authToken') !== null;
-        //     if (isLoggedIn) {
-        //         this.props.history.push('/');
-        //     }
-        // }
 
         render() {
             return (

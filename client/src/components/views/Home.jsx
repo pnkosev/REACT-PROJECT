@@ -29,7 +29,6 @@ class Home extends Component {
 
     render() {
         const { posts, hasFetched } = this.state;
-        const {isLoggedIn} = this.props;
         return (
             <div>
                 <h1>This is the home page</h1>
@@ -45,13 +44,9 @@ class Home extends Component {
                         <article key={p._id}>
                             <h2>{p.title}</h2>
                             <div>{p.content}</div>
-                            {
-                                isLoggedIn ? 
-                                <button>
-                                    <Link to={"post/" + p._id}>Details</Link>
-                                </button>
-                                : null
-                            }
+                            <button>
+                                <Link to={"post/" + p._id}>Details</Link>
+                            </button>
                         </article>))
                     : <h2>Currently no posts...</h2>
                 }

@@ -33,7 +33,8 @@ module.exports = {
 			})
 			.catch(() => {
 				return res.status(401).json({
-				  message: 'Token verification failed!'
+					//message: 'Token verification failed!'
+					message: 'Access denied!'
 				});
 			});
 	},
@@ -56,7 +57,7 @@ module.exports = {
 					})
 					.catch(() => {
 						return res.status(401).json({
-						message: 'Token verification failed!'
+						message: 'Access denied!'
 						});
 					});
 			} else {

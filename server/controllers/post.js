@@ -19,8 +19,8 @@ function validatePost(req, res) {
 
 module.exports = {
 	getPosts: (req, res, next) => {
-		// Retrieve all posts in JSON format
-		Post.find()
+		Post
+			.find()
 			.then((posts) => {
 				res
 					.status(200)
@@ -77,7 +77,8 @@ module.exports = {
 	deletePost: (req, res, next) => {
 		const postId = req.params.postId;
 
-		Post.findById(postId)
+		Post
+			.findById(postId)
 			.then(async (post) => {
 				if (!post) {
 					const error = new Error('Post not found!');
@@ -125,11 +126,12 @@ module.exports = {
 
 		Post
 			.findById(postId)
-			.populate('comments')
-			//.where('status', 'Approved')
-			.populate('likes')
-			.populate('hates')
-			.populate('creator')
+			.populate({
+				path: 'comments',
+				match: { status:  'Approved' }})
+			.populate('likes', 'username _id')
+			.populate('hates', 'username _id')
+			.populate('creator', 'username _id')
 			.then((post) => {
 				if (!post) {
 					const error = new Error('Post not found!');
@@ -199,5 +201,91 @@ module.exports = {
 					next(error);
 				});
 		}
+	},
+	likePost: (req, res, next) => {
+		const postId = req.params.postId;
+
+		Post
+			.findById(postId)
+			.then((post) => {
+				if(post.creator.toString() === req.userId) {
+					const error = new Error('You narcissitic bastard, you cannot like your own post!');
+					error.statusCode = 422;
+					throw error;
+				}
+
+				if(post.likes.indexOf(req.userId) !== -1) {
+					const error = new Error('You have already liked this post!');
+					error.statusCode = 422;
+					throw error;
+				}
+
+				if(post.hates.indexOf(req.userId) !== -1) {
+					post.hates.pull(req.userId);
+				}
+
+				post.likes.push(req.userId);
+				return post.save();
+			})
+			.then(() => {
+				return Post.findById(postId).populate('likes', 'username _id').populate('hates', 'username _id');
+			})
+			.then((post) => {
+				res.status(200).json({
+					success: true,
+					message: 'Like noted!',
+					post
+				})
+			})
+			.catch((error) => {
+				if (!error.statusCode) {
+					error.statusCode = 500;
+				}
+
+				next(error);
+			});
+	},
+	hatePost: (req, res, next) => {
+		const postId = req.params.postId;
+
+		Post
+			.findById(postId)
+			.then((post) => {
+				if(post.creator.toString() === req.userId) {
+					const error = new Error('Cannot hate your posts yo!');
+					error.statusCode = 422;
+					throw error;
+				}
+
+				if(post.hates.indexOf(req.userId) !== -1) {
+					const error = new Error('You hated enough this poor post!');
+					error.statusCode = 422;
+					throw error;
+				}
+
+				if(post.likes.indexOf(req.userId) !== -1) {
+					post.likes.pull(req.userId);
+				}
+
+				post.hates.push(req.userId);
+				return post.save();
+			})
+			.then(() => {
+				return Post.findById(postId).populate('hates', 'username _id').populate('likes', 'username _id');
+			})
+			.then((post) => {
+				res.status(200).json({
+					success: true,
+					message: 'Like noted!',
+					post
+				})
+			})
+			.catch((error) => {
+				if (!error.statusCode) {
+					error.statusCode = 500;
+				}
+
+				next(error);
+			});
 	}
 }

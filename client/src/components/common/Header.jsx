@@ -4,7 +4,7 @@ import '../../styles/navigation.css';
 
 export default class Header extends Component {
     render() {
-        const { isLoggedIn, onLogout, username } = this.props;
+        const { isLoggedIn, onLogout, username, isAdmin } = this.props;
 
         return (
             <header>
@@ -15,6 +15,16 @@ export default class Header extends Component {
                         isLoggedIn
                             ? (
                                 <ul>
+                                    {
+                                        isAdmin
+                                        ? (
+                                            <li>
+                                                <NavLink exact to="/comment/pending" activeClassName="active">Work-work</NavLink>
+                                            </li>
+                                        ) : (
+                                            null
+                                        )
+                                    }
                                     <li>
                                         <NavLink exact to="/" activeClassName="active">Home</NavLink>
                                     </li>
