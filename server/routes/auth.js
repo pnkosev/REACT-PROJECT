@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { body } = require('express-validator/check');
 
 const authController = require('../controllers/auth');
+const { isAuth } = require('../middleware/is-auth');
 const User = require('../models/User');
 
 router.post('/register',
@@ -46,5 +47,7 @@ router.post('/login',
 		.withMessage('Please enter a valid password.'),
 	], 
 authController.login);
+
+router.get('/profile', isAuth, authController.getMyPosts);
 
 module.exports = router;

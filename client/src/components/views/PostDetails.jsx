@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import PostService from '../../services/post';
 import notify from '../../helpers/notifier';
 import CommentSection from '../forms/CommentSection';
+import ServerNotResponding from './SeverNotResponding';
+import ErrorBoundary from '../common/ErrorBoundary';
+import CommentService from '../../services/comment';
 
 class PostDetails extends Component {
     constructor(props) {
@@ -14,21 +17,23 @@ class PostDetails extends Component {
             isAuthor: false,
             user: false,
             comments: [],
-            hasError: false,
+            hasServerIssue: false,
         }
 
         this.deletePost = this.deletePost.bind(this);
         this.likePost = this.likePost.bind(this);
         this.hatePost = this.hatePost.bind(this);
+        this.deleteComment = this.deleteComment.bind(this);
     }
 
-    static service = new PostService();
+    static postService = new PostService();
+    static commentService = new CommentService();
 
     async deletePost() {
         const postId = this.props.match.params.postId;
 
         try {
-            PostDetails.service
+            PostDetails.postService
                 .remove(postId)
                 .then((res) => {
                     if (!res.success) {
@@ -41,6 +46,7 @@ class PostDetails extends Component {
                 })
         } catch (err) {
             console.log(err);
+            this.setState({ hasServerIssue: true});
         }
     }
 
@@ -48,17 +54,18 @@ class PostDetails extends Component {
         const postId = this.props.match.params.postId;
 
         try {
-            let res = await PostDetails.service.postLike(postId);
+            let res = await PostDetails.postService.postLike(postId);
 
             if (!res.success) {
                 notify('error', res.message);
                 return;
             } else {
                 notify('success', res.message);
-                this.setState({ post: res.post });
+                this.setState({ post: res.post, hasFetched: true });
             }
         } catch (err) {
             console.log(err);
+            this.setState({ hasServerIssue: true});
         }
     }
 
@@ -66,26 +73,49 @@ class PostDetails extends Component {
         const postId = this.props.match.params.postId;
 
         try {
-            let res = await PostDetails.service.postHate(postId);
+            let res = await PostDetails.postService.postHate(postId);
 
             if (!res.success) {
                 notify('error', res.message);
                 return;
             } else {
                 notify('success', res.message)
-                this.setState({ post: res.post });
+                this.setState({ post: res.post, hasFetched: true });
             }
         } catch (err) {
+            console.log(err);
+            this.setState({ hasServerIssue: true});
+        }
+    }
+
+    async deleteComment(id) {
+        let comments = this.state.comments.slice();
+        let index = comments.findIndex(c => c._id === id);
+        comments.splice(index, 1);
+        
+        try {
+            let data = await PostDetails.commentService.deleteComment(id);
+
+            if (!data.success) {
+                notify('error', data.message);
+                return;
+            } else {
+                this.setState({ comments })
+                notify('success', data.message);
+            }
+
+        } catch(err) {
+            this.setState({ hasServerIssue: true });
             console.log(err);
         }
     }
 
     componentDidMount() {
         const postId = this.props.match.params.postId;
-        PostDetails.service
+        PostDetails.postService
             .getById(postId)
             .then(data => {
-                let isAuthor = false;
+                let isAuthor;
                 let user;
                 if (localStorage.getItem('userId')) {
                     isAuthor = data.post.creator._id === localStorage.getItem('userId') ? true : false;
@@ -93,20 +123,24 @@ class PostDetails extends Component {
                 }
                 this.setState({
                     post: data.post,
-                    hasFetched: !this.state.hasFetched,
+                    hasFetched: true,
                     isAuthor,
                     user,
                     comments: data.post.comments,
                 })
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err);
+                this.setState({ hasServerIssue: true});
+            });
     }
 
     render() {
-        const { post, hasFetched, isAuthor, user, comments, hasError } = this.state;
+        const { post, hasFetched, isAuthor, user, comments, hasServerIssue } = this.state;
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
-        if (hasError) {
-            return <div>Please excuse us, we are working on the problem...</div>
+        if (hasServerIssue) {
+            return <ServerNotResponding/>
         }
 
         return (
@@ -119,19 +153,34 @@ class PostDetails extends Component {
                             <section>
                                 <h2>Title: {post.title}</h2>
                                 <div>{post.content}</div>
+                                {
+                                    isAuthor || isAdmin
+                                        ? (
+                                            <section>
+                                                <button>
+                                                    <Link to={`/post/update/${post._id}`}>Edit</Link>
+                                                </button>
+                                                <button type="submit" onClick={this.deletePost}>
+                                                    Delete
+                                                </button>
+                                            </section>
+                                        ) : (
+                                            null
+                                        )
+                                }
                                 <span>Likes: {post.likes.length}</span>
                                 <span>Hates: {post.hates.length}</span>
                                 <br />
                                 {
-                                    user 
-                                    ? (
-                                        <Fragment>
-                                            <button onClick={this.likePost}>Like</button>
-                                            <button onClick={this.hatePost}>Hate</button>
-                                        </Fragment>
-                                    ) : (
-                                        null
-                                    )
+                                    user
+                                        ? (
+                                            <Fragment>
+                                                <button onClick={this.likePost}>Like</button>
+                                                <button onClick={this.hatePost}>Hate</button>
+                                            </Fragment>
+                                        ) : (
+                                            null
+                                        )
                                 }
                                 <div>PPL likin'</div>
                                 <ul>
@@ -158,27 +207,18 @@ class PostDetails extends Component {
                                     }
                                 </ul>
                                 {
-                                    isAuthor
+                                    user
                                         ? (
-                                            <section>
-                                                <button>
-                                                    <Link to={`update/${post._id}`}>Edit</Link>
-                                                </button>
-                                                <button type="submit" onClick={this.deletePost}>
-                                                    Delete
-                                                </button>
-                                            </section>
+                                           <ErrorBoundary>
+                                               <CommentSection
+                                                postId={post._id}
+                                                comments={comments}
+                                                deleteComment={(id) => this.deleteComment(id)}
+                                            />
+                                            </ErrorBoundary>
                                         ) : (
                                             null
                                         )
-                                }
-                                {
-                                    user
-                                    ? (
-                                        <CommentSection postId={post._id} comments={comments} />
-                                    ) : (
-                                        null
-                                    )
                                 }
                             </section>
                         )

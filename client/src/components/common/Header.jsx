@@ -29,6 +29,9 @@ export default class Header extends Component {
                                         <NavLink exact to="/" activeClassName="active">Home</NavLink>
                                     </li>
                                     <li>
+                                        <NavLink to="/user/profile" activeClassName="active">Profile</NavLink>
+                                    </li>
+                                    <li>
                                         <NavLink to="/post/create" activeClassName="active">Post</NavLink>
                                     </li>
                                     <li>

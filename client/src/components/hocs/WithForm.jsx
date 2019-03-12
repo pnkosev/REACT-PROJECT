@@ -68,6 +68,7 @@ const withForm = (WrappedComponent, model) =>
                 }
             }
             catch (err) {
+                this.setState({ hasServerIssue: true });
                 console.log(err);
             }
         }

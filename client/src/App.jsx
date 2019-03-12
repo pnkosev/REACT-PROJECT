@@ -4,24 +4,32 @@ import toastr from 'toastr';
 
 import './styles/typography.css'
 
-import PrivateRoute from './components/common/PrivateRoute';
+import AdminRoute from './components/hocs/AdminRoute';
+import PrivateRoute from './components/hocs/PrivateRoute';
+
 import Home from './components/views/Home';
-import NotFound from './components/views/NotFound';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import PostDetails from './components/views/PostDetails';
+import Profile from './components/views/Profile';
+import CommentsPending from './components/views/CommentsPending';
+import NotFound from './components/views/NotFound';
 
 import { postRegister, postLogin } from './services/auth';
 import PostService from './services/post';
 
+import notify from './helpers/notifier';
+
 import validateRegisterForm from './helpers/formValidators/registerFormValidator'
 import validateLoginForm from './helpers/formValidators/loginFormValidator';
 import validateCreatePostForm from './helpers/formValidators/createPostValidator';
+
 import WithFormRegister from './components/forms/Register';
 import WithFormLogin from './components/forms/Login';
 import WithFormCreatePost from './components/forms/CreatePost';
 import EditPost from './components/forms/EditPost';
-import CommentsPending from './components/views/CommentsPending';
+import EditComment from './components/forms/EditComment';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 toastr.options.newestOnTop = false;
 toastr.options.closeButton = true;
@@ -43,6 +51,7 @@ class App extends Component {
 	onLogout(e) {
 		e.preventDefault();
 		localStorage.clear();
+		notify('success', 'You have successfully logged out!');
 		// this.setState({
 		// 	isLoggedIn: false,
 		// 	username: ''
@@ -88,6 +97,11 @@ class App extends Component {
 							{...props}
 						/>
 					} />
+					<PrivateRoute path="/user/profile" exact render={(props) => 
+						<Profile
+							{...props}
+						/>
+					} />
 					<PrivateRoute path="/post/create" exact render={(props) => 
 						<WithFormCreatePost
 							request={App.postService.postCreate}
@@ -106,8 +120,13 @@ class App extends Component {
 							{...props}
 						/>
 					} />
-					<PrivateRoute path="/comment/pending" exact render={(props) => 
+					<AdminRoute path="/comment/pending" exact render={(props) => 
 						<CommentsPending {...props}/>
+					} />
+					<Route path="/comment/update/:commentId" exact render={(props) => 
+						<EditComment
+							{...props}
+						/>
 					} />
 					<Route component={NotFound} />
 				</Switch>

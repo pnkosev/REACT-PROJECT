@@ -173,7 +173,8 @@ module.exports = {
     getPendingComments: (req, res, next) => {
         Comment
             .find()
-            .where('status', 'Pending')
+			.where('status', 'Pending')
+			.populate('creator', 'username _id status')
             .then((comments) => {
                 res
 					.status(200)
@@ -221,5 +222,5 @@ module.exports = {
 
                 next(error);
             });
-    }
+	}
 }

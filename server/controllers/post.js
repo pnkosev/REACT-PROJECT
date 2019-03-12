@@ -128,7 +128,11 @@ module.exports = {
 			.findById(postId)
 			.populate({
 				path: 'comments',
-				match: { status:  'Approved' }})
+				match: { status:  'Approved' },
+				populate: {
+					path: 'creator'
+				}
+			})
 			.populate('likes', 'username _id')
 			.populate('hates', 'username _id')
 			.populate('creator', 'username _id')
@@ -258,7 +262,7 @@ module.exports = {
 				}
 
 				if(post.hates.indexOf(req.userId) !== -1) {
-					const error = new Error('You hated enough this poor post!');
+					const error = new Error('You have hated enough this poor post!');
 					error.statusCode = 422;
 					throw error;
 				}
@@ -276,7 +280,7 @@ module.exports = {
 			.then((post) => {
 				res.status(200).json({
 					success: true,
-					message: 'Like noted!',
+					message: 'Hate noted!',
 					post
 				})
 			})

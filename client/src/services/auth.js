@@ -1,4 +1,4 @@
-import { post } from '../helpers/requester';
+import { get, post } from '../helpers/requester';
 const host = `http://localhost:9999/`;
 
 
@@ -10,9 +10,14 @@ function postLogin(credentials) {
     return post(`${host}user/login`, credentials);
 }
 
+function getProfile() {
+    return get(`${host}user/profile`);
+}
+
 export {
     postRegister,
-    postLogin
+    postLogin,
+    getProfile
 };
 
 // class AuthService {

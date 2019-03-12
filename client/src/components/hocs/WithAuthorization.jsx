@@ -35,6 +35,6 @@ export function withAdminAuthorization(Component) {
     return withAuthorization(Component, ['Admin']);
 }
 
-export function withUserAuthorization(Component) {
-    return withAuthorization(Component, ['User']);
-}
+// export function withUserAuthorization(Component) {
+//     return withAuthorization(Component, ['User']);
+// }

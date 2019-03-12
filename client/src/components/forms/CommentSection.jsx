@@ -5,6 +5,9 @@ import Comment from '../common/Comment';
 
 import notify from '../../helpers/notifier';
 import CommentService from '../../services/comment';
+import ErrorBoundary from '../common/ErrorBoundary';
+
+import ServerNotResponding from '../views/SeverNotResponding';
 
 class CommentSection extends Component {
     constructor(props) {
@@ -12,17 +15,16 @@ class CommentSection extends Component {
 
         this.state = {
             content: '',
-            comments: [],
             isAdmin: false,
-            error: {}
+            error: {},
+            hasServerIssue: false,
         }
 
         this.handleChange = this.handleChange.bind(this);
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
-        this.deleteComment = this.deleteComment.bind(this);
     }
 
-    static service = new CommentService();
+    static commentService = new CommentService();
 
     handleChange(e) {
         this.setState({
@@ -44,7 +46,7 @@ class CommentSection extends Component {
         
         try {
             const postId = this.props.postId;
-            let res = await CommentSection.service.postComment(postId, {content});
+            let res = await CommentSection.commentService.postComment(postId, {content});
 
             if (!res.success) {
                 if (res.errors) {
@@ -61,50 +63,28 @@ class CommentSection extends Component {
                     return;
                 }
             } else {
-                this.setState({
-                    content: '',
-                })
+                this.setState({ content: '' })
                 notify('success', res.message);
             }
         } catch(err) {
+            this.setState({ hasServerIssue: true });
             console.log(err);
         };
     }
 
-    async deleteComment(id) {
-        let comments = this.state.comments.slice();
-        let index = comments.findIndex(c => c._id === id);
-        comments.splice(index, 1);
-        
-        try {
-            let data = await CommentSection.service.deleteComment(id);
-
-            if (!data.success) {
-                notify('error', data.message);
-                return;
-            } else {
-                this.setState({
-                    comments: comments,
-                })
-                notify('success', data.message);
-                return;
-            }
-
-        } catch(err) {
-            console.log(err);
-        }
-    }
-
     componentDidMount() {
         const isAdmin = (localStorage.getItem('isAdmin') === 'true');
-        this.setState({
-            comments: this.props.comments,
-            isAdmin,
-        })
+        this.setState({ isAdmin });
     }
 
     render() {
-        const { comments, isAdmin } = this.state;
+        const { isAdmin, hasServerIssue } = this.state;
+        const { comments, deleteComment } = this.props;
+
+        if (hasServerIssue) {
+            return <ServerNotResponding />
+        }
+
         return (
             <div className="container">
                 <h2>Leave a comment</h2>
@@ -122,20 +102,23 @@ class CommentSection extends Component {
                     <input type="submit" className="btn btn-primary" value="Comment" />
                 </form>
                 <div>
-                <h4>Comments:</h4>
+                <ErrorBoundary>
+                    <h4>Comments:</h4>
                     {
                         comments.length
                         ? (comments.map(c =>
                             <Comment
-                                deleteComment={(id) => this.deleteComment(id)}
+                                username={c.creator.username}
+                                deleteComment={() => deleteComment(c._id)}
                                 key={c._id}
                                 id={c._id}
                                 content={c.content}
-                                creator={c.creator}
+                                creator={c.creator._id}
                                 isAdmin={isAdmin}
                             />)
                         ) : <h5>No comments yet...</h5>
                     }
+                </ErrorBoundary> 
                 </div>
             </div>
          );

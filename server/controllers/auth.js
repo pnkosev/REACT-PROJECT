@@ -106,5 +106,28 @@ module.exports = {
 					next(error);
 				})
 		}
+	},
+	getMyPosts: (req, res, next) => {
+		const userId = req.userId;
+
+		User
+			.findById(userId)
+			.populate('posts')
+			.then(user => {
+				res
+					.status(200)
+					.json({
+						success: true,
+						message: `Here are your posts, ${user.username}!`,
+						posts: user.posts
+				});
+			})
+			.catch(error => {
+				if (!error.statusCode) {
+					error.statusCode = 500;
+				}
+
+				next(error);
+			})
 	}
 }

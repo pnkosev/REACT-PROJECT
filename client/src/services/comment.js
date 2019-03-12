@@ -14,8 +14,16 @@ class CommentService {
         return get(this.baseUrl + 'pending')
     }
 
+    getCommentById(id) {
+        return get(this.baseUrl + 'get/' + id);
+    }
+
     approveComment(id) {
         return put(this.baseUrl + 'approve/' + id);
+    }
+
+    updateComment(id, content) {
+        return put(this.baseUrl + 'update/' + id, content);
     }
 
     deleteComment(id) {

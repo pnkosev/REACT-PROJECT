@@ -11,10 +11,10 @@ class Home extends Component {
         }
     }
 
-    static service = new PostService();
+    static postServices = new PostService();
 
     componentDidMount() {
-        Home.service
+        Home.postServices
             .getAll()
             .then((data) => {
                 this.setState({
@@ -45,7 +45,7 @@ class Home extends Component {
                             <h2>{p.title}</h2>
                             <div>{p.content}</div>
                             <button>
-                                <Link to={"post/" + p._id}>Details</Link>
+                                <Link to={"/post/" + p._id}>Details</Link>
                             </button>
                         </article>))
                     : <h2>Currently no posts...</h2>

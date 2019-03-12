@@ -6,7 +6,7 @@ const { isAuth, isInRole } = require('../middleware/is-auth');
 
 router.get('/all', postController.getPosts);
 
-router.post('/create', isAuth, [
+router.post('/create', [
   body('title')
     .trim()
     .not().isEmpty()
@@ -17,10 +17,11 @@ router.post('/create', isAuth, [
     .not().isEmpty()
     .isLength({ min: 50 })
     .withMessage('Please enter a valid content- minimum 50 chararcters.'),
-], 
-postController.postCreatePost);
+],
+isAuth, postController.postCreatePost);
 
 router.get('/:postId', postController.getPostById);
+
 router.put('/update/:postId', [
   body('title')
     .trim()
@@ -34,6 +35,7 @@ router.put('/update/:postId', [
     .withMessage('Please enter a valid content- minimum 50 chararcters.'),
 ],
 isAuth || isInRole('Admin'), postController.updatePost);
+
 router.delete('/delete/:postId', isAuth || isInRole('Admin'), postController.deletePost);
 
 router.post('/like/:postId' , isAuth, postController.likePost);
