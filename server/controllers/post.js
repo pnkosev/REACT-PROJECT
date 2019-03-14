@@ -120,15 +120,13 @@ module.exports = {
 
 				return Promise.all([
 					Post.findByIdAndDelete(postId),
-					Comment.deleteMany({post: postId})
+					Comment.deleteMany({post: postId}),
+					User.findById(post.creator)
 				]);
 			})
-			.then(() => {
-				return User.findById(req.userId);
-			})
-			.then((user) => {
-				user.posts.pull(postId);
-				return user.save();
+			.then(([p, c, u]) => {
+				u.posts.pull(p._id);
+				return u.save();
 			})
 			.then(() => {
 				res.status(200)

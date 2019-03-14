@@ -53,7 +53,7 @@ class App extends Component {
 	updateUser = (user) => {
 		this.setState({
 			user
-		})
+		});
 	}
 
 	onLogout(e) {
@@ -74,8 +74,8 @@ class App extends Component {
 			isLoggedIn,
 			username,
 			isAdmin
-		}
-		this.updateUser(user)
+		};
+		this.updateUser(user);
 	}
 
 	render() {
