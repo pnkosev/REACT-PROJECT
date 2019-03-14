@@ -1,7 +1,10 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 import Input from '../common/Input';
 import withForm from '../hocs/WithForm';
+import withError from '../hocs/WithError';
 import userLoginModel from '../../helpers/models/userLoginModel';
+import { UserConsumer } from '../contexts/UserContext';
 
 // class Login extends Component {
 //     constructor(props) {
@@ -79,6 +82,12 @@ import userLoginModel from '../../helpers/models/userLoginModel';
 // }
 
 const LoginBase = (props) => {
+    const { isLoggedIn } = props;
+    if (isLoggedIn) {
+        return (
+            <Redirect to="/" />
+        );
+    }
     return (
         <div className="container">
             <h1>Login</h1>
@@ -106,4 +115,20 @@ const LoginBase = (props) => {
 }
 
 const WithFormLogin = withForm(LoginBase, userLoginModel);
-export default WithFormLogin;
+
+const LoginWithContext = (props) => {
+    return (
+        <UserConsumer>
+            {
+                (user) => (
+                    <WithFormLogin
+                        {...props}
+                        isLoggedIn={user.isLoggedIn}
+                    />
+                )
+            }
+        </UserConsumer>
+    )
+}
+
+export default withError(LoginWithContext);

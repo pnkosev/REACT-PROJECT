@@ -1,4 +1,4 @@
-import { get, post, put, remove } from '../helpers/requester';
+import { get, post, put, remove } from '../helpers/data/requester';
 const host = `http://localhost:9999/`;
 
 class CommentService {

@@ -48,6 +48,6 @@ router.post('/login',
 	], 
 authController.login);
 
-router.get('/profile', isAuth, authController.getMyPosts);
+router.get('/profile', isAuth, authController.getProfile);
 
 module.exports = router;

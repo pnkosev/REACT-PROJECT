@@ -107,7 +107,7 @@ module.exports = {
 				})
 		}
 	},
-	getMyPosts: (req, res, next) => {
+	getProfile: (req, res, next) => {
 		const userId = req.userId;
 
 		User

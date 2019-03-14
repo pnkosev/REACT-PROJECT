@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
+import { UserConsumer } from '../contexts/UserContext';
 import '../../styles/navigation.css';
 
-export default class Header extends Component {
+class Header extends Component {
     render() {
         const { isLoggedIn, onLogout, username, isAdmin } = this.props;
 
@@ -19,7 +20,7 @@ export default class Header extends Component {
                                         isAdmin
                                         ? (
                                             <li>
-                                                <NavLink exact to="/comment/pending" activeClassName="active">Work-work</NavLink>
+                                                <NavLink exact to="/user/admin/work" activeClassName="active">Work-work</NavLink>
                                             </li>
                                         ) : (
                                             null
@@ -57,3 +58,22 @@ export default class Header extends Component {
         );
     }
 }
+
+const HeaderWithUserContext = (props) => {
+    return (
+        <UserConsumer>
+            {
+                (user) => (
+                    <Header
+                        {...props}
+                        isLoggedIn={user.isLoggedIn}
+                        username={user.username}
+                        isAdmin={user.isAdmin}
+                    />
+                )
+            }
+        </UserConsumer>
+    )
+}
+
+export default HeaderWithUserContext;

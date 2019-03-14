@@ -18,9 +18,33 @@ function validatePost(req, res) {
 }
 
 module.exports = {
-	getPosts: (req, res, next) => {
+	getApprovedPosts: (req, res, next) => {
 		Post
 			.find()
+			.where('status', 'Approved')
+			.populate('creator', 'username _id')
+			.then((posts) => {
+				res
+					.status(200)
+					.json({
+						success: true,
+						message: 'Fetched posts successfully.',
+						posts
+					});
+			})
+			.catch((error) => {
+				if (!error.statusCode) {
+					error.statusCode = 500;
+				}
+
+				next(error);
+			});
+	},
+	getPendingPosts: (req, res, next) => {
+		Post
+			.find()
+			.where('status', 'Pending')
+			.populate('creator', 'username _id')
 			.then((posts) => {
 				res
 					.status(200)
@@ -61,7 +85,7 @@ module.exports = {
 						.status(201)
 						.json({
 							success: true,
-							message: 'Post created successfully!',
+							message: 'Post created successfully! Needs approval though...',
 							post: post,
 						})
 				})
@@ -205,6 +229,37 @@ module.exports = {
 					next(error);
 				});
 		}
+	},
+	approvePost: (req, res, next) => {
+		const postId = req.params.postId;
+
+        Post
+            .findById(postId)
+            .then((post) => {
+                if (!post) {
+                    const error = new Error('Post not found');
+                    error.statusCode = 404;
+                    throw error;
+                }
+                post.status = 'Approved';
+                return post.save();
+            })
+            .then((post) => {
+                res
+                    .status(200)
+                    .json({
+						success: true,
+                        message: 'Post approved!',
+                        post
+                })
+            })
+            .catch((error) => {
+                if (!error.statusCode) {
+                    error.statusCode = 500;
+                }
+
+                next(error);
+            });
 	},
 	likePost: (req, res, next) => {
 		const postId = req.params.postId;

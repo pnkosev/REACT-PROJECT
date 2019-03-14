@@ -4,7 +4,8 @@ const { body } = require('express-validator/check');
 const postController = require('../controllers/post');
 const { isAuth, isInRole } = require('../middleware/is-auth');
 
-router.get('/all', postController.getPosts);
+router.get('/all', postController.getApprovedPosts);
+router.get('/pending', isInRole('Admin'), postController.getPendingPosts);
 
 router.post('/create', [
   body('title')
@@ -35,6 +36,7 @@ router.put('/update/:postId', [
     .withMessage('Please enter a valid content- minimum 50 chararcters.'),
 ],
 isAuth || isInRole('Admin'), postController.updatePost);
+router.put('/approve/:postId', isInRole('Admin'), postController.approvePost);
 
 router.delete('/delete/:postId', isAuth || isInRole('Admin'), postController.deletePost);
 

@@ -1,12 +1,14 @@
-import { get, post, put, remove } from '../helpers/requester';
+import { get, post, put, remove } from '../helpers/data/requester';
 const host = `http://localhost:9999/`;
 
 class PostService {
     constructor() {
         this.baseUrl = `${host}post/`;
         this.getAllUrl = `${this.baseUrl}all`;
+        this.getPendingUrl = `${this.baseUrl}pending`;
         this.createUrl = `${this.baseUrl}create`;
         this.updateUrl = `${this.baseUrl}update/`;
+        this.approvePostUrl = `${this.baseUrl}approve/`
         this.deleteUrl = `${this.baseUrl}delete/`;
         this.likeUrl = `${this.baseUrl}like/`;
         this.hateUrl = `${this.baseUrl}hate/`;
@@ -14,6 +16,10 @@ class PostService {
 
     getAll() {
         return get(this.getAllUrl);
+    }
+
+    getPending() {
+        return get(this.getPendingUrl);
     }
 
     postCreate(p) {
@@ -26,6 +32,10 @@ class PostService {
 
     update(id, post) {
         return put(this.updateUrl + id, post);
+    }
+
+    approvePost(id) {
+        return put(this.approvePostUrl + id);
     }
 
     remove(id) {

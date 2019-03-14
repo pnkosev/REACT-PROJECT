@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import notify from '../../helpers/notifier';
+import notify from '../../helpers/data/notifier';
 
 class PrivateRoute extends Component {
     render() {

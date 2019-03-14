@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 
-import notify from '../../helpers/notifier';
+import notify from '../../helpers/data/notifier';
+import getRequestData from '../../helpers/data/getRequestData';
+import ServerNotResponding from '../views/Issue/SeverNotResponding';
 
-const withForm = (WrappedComponent, model) =>
-    class WithForm extends Component {
+const withForm = (WrappedComponent, model) => {
+    return class WithForm extends Component {
         constructor(props) {
             super(props);
 
             this.state = {
                 ...model.defaultState,
-                error: {}
+                error: {},
+                hasServerIssue: false,
             };
 
             this.handleChange = this.handleChange.bind(this);
@@ -24,13 +27,7 @@ const withForm = (WrappedComponent, model) =>
 
         async handleFormSubmit(e) {
             e.preventDefault();
-
-            const credentials = Object.keys(this.state).reduce((object, key) => {
-                if (key !== 'error') {
-                    object[key] = this.state[key]
-                }
-                return object;
-            }, {});
+            const credentials = getRequestData(this.state, model.defaultState);
 
             let validationResult = this.props.validateForm(credentials);
 
@@ -48,7 +45,6 @@ const withForm = (WrappedComponent, model) =>
                             obj[key['param']] = key['msg']
                             return obj;
                         }, {})
-        
                         this.setState({ error: errors });
                         notify('error', 'Invalid input', errors);
                         return;
@@ -62,6 +58,13 @@ const withForm = (WrappedComponent, model) =>
                         localStorage.setItem('username', res.username);
                         localStorage.setItem('userId', res.userId);
                         localStorage.setItem('isAdmin', res.isAdmin);
+
+                        let user = {
+                            isLoggedIn: res.success,
+                            username: res.username,
+                            isAdmin: res.isAdmin,
+                        }
+                        this.props.updateUser(user);
                     }
                     notify('success', res.message);
                     this.props.history.push('/');
@@ -74,13 +77,23 @@ const withForm = (WrappedComponent, model) =>
         }
 
         render() {
+            const { hasServerIssue } = this.state;
+
+            if (hasServerIssue) {
+                return <ServerNotResponding />;
+            }
+
             return (
                 <WrappedComponent
+                    {...this.props}
                     handleChange={this.handleChange}
                     handleFormSubmit={this.handleFormSubmit}
                 />
             );
         }
     };
+}
+    
+
 
 export default withForm;

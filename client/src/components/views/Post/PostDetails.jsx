@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import PostService from '../../services/post';
-import notify from '../../helpers/notifier';
-import CommentSection from '../forms/CommentSection';
-import ServerNotResponding from './SeverNotResponding';
-import ErrorBoundary from '../common/ErrorBoundary';
-import CommentService from '../../services/comment';
+import PostService from '../../../services/post';
+import notify from '../../../helpers/data/notifier';
+import CommentSection from '../Comment/CommentSection';
+import ServerNotResponding from '../Issue/SeverNotResponding';
+import ErrorBoundary from '../../hocs/ErrorBoundary';
+import CommentService from '../../../services/comment';
+import { UserConsumer } from '../../contexts/UserContext';
 
 class PostDetails extends Component {
     constructor(props) {
@@ -15,7 +16,6 @@ class PostDetails extends Component {
             post: {},
             hasFetched: false,
             isAuthor: false,
-            user: false,
             comments: [],
             hasServerIssue: false,
         }
@@ -46,7 +46,7 @@ class PostDetails extends Component {
                 })
         } catch (err) {
             console.log(err);
-            this.setState({ hasServerIssue: true});
+            this.setState({ hasServerIssue: true });
         }
     }
 
@@ -65,7 +65,7 @@ class PostDetails extends Component {
             }
         } catch (err) {
             console.log(err);
-            this.setState({ hasServerIssue: true});
+            this.setState({ hasServerIssue: true });
         }
     }
 
@@ -84,7 +84,7 @@ class PostDetails extends Component {
             }
         } catch (err) {
             console.log(err);
-            this.setState({ hasServerIssue: true});
+            this.setState({ hasServerIssue: true });
         }
     }
 
@@ -92,7 +92,7 @@ class PostDetails extends Component {
         let comments = this.state.comments.slice();
         let index = comments.findIndex(c => c._id === id);
         comments.splice(index, 1);
-        
+
         try {
             let data = await PostDetails.commentService.deleteComment(id);
 
@@ -104,7 +104,7 @@ class PostDetails extends Component {
                 notify('success', data.message);
             }
 
-        } catch(err) {
+        } catch (err) {
             this.setState({ hasServerIssue: true });
             console.log(err);
         }
@@ -116,31 +116,28 @@ class PostDetails extends Component {
             .getById(postId)
             .then(data => {
                 let isAuthor;
-                let user;
                 if (localStorage.getItem('userId')) {
                     isAuthor = data.post.creator._id === localStorage.getItem('userId') ? true : false;
-                    user = true;
                 }
                 this.setState({
                     post: data.post,
                     hasFetched: true,
                     isAuthor,
-                    user,
                     comments: data.post.comments,
                 })
             })
             .catch(err => {
                 console.log(err);
-                this.setState({ hasServerIssue: true});
+                this.setState({ hasServerIssue: true });
             });
     }
 
     render() {
-        const { post, hasFetched, isAuthor, user, comments, hasServerIssue } = this.state;
-        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+        const { post, hasFetched, isAuthor, comments, hasServerIssue } = this.state;
+        const { isAdmin, isLoggedIn } = this.props;
 
         if (hasServerIssue) {
-            return <ServerNotResponding/>
+            return <ServerNotResponding />
         }
 
         return (
@@ -172,7 +169,7 @@ class PostDetails extends Component {
                                 <span>Hates: {post.hates.length}</span>
                                 <br />
                                 {
-                                    user
+                                    isLoggedIn
                                         ? (
                                             <Fragment>
                                                 <button onClick={this.likePost}>Like</button>
@@ -207,14 +204,15 @@ class PostDetails extends Component {
                                     }
                                 </ul>
                                 {
-                                    user
+                                    isLoggedIn
                                         ? (
-                                           <ErrorBoundary>
-                                               <CommentSection
-                                                postId={post._id}
-                                                comments={comments}
-                                                deleteComment={(id) => this.deleteComment(id)}
-                                            />
+                                            <ErrorBoundary>
+                                                <CommentSection
+                                                    isAdmin={isAdmin}
+                                                    postId={post._id}
+                                                    comments={comments}
+                                                    deleteComment={(id) => this.deleteComment(id)}
+                                                />
                                             </ErrorBoundary>
                                         ) : (
                                             null
@@ -228,4 +226,20 @@ class PostDetails extends Component {
     }
 }
 
-export default PostDetails;
+const PostDetailsWithUserContext = (props) => {
+    return (
+        <UserConsumer>
+            {
+                (user) => (
+                    <PostDetails
+                        {...props}
+                        isLoggedIn={user.isLoggedIn}
+                        isAdmin={user.isAdmin}
+                    />
+                )
+            }
+        </UserConsumer>
+    )
+}
+
+export default PostDetailsWithUserContext;

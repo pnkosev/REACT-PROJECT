@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 
-import Input from '../common/Input';
-import Comment from '../common/Comment';
+import Input from '../../common/Input';
+import Comment from './Comment';
 
-import notify from '../../helpers/notifier';
-import CommentService from '../../services/comment';
-import ErrorBoundary from '../common/ErrorBoundary';
+import notify from '../../../helpers/data/notifier';
+import CommentService from '../../../services/comment';
+import ErrorBoundary from '../../hocs/ErrorBoundary';
 
-import ServerNotResponding from '../views/SeverNotResponding';
+import ServerNotResponding from '../Issue/SeverNotResponding';
 
 class CommentSection extends Component {
     constructor(props) {
@@ -15,7 +15,6 @@ class CommentSection extends Component {
 
         this.state = {
             content: '',
-            isAdmin: false,
             error: {},
             hasServerIssue: false,
         }
@@ -72,14 +71,9 @@ class CommentSection extends Component {
         };
     }
 
-    componentDidMount() {
-        const isAdmin = (localStorage.getItem('isAdmin') === 'true');
-        this.setState({ isAdmin });
-    }
-
     render() {
-        const { isAdmin, hasServerIssue } = this.state;
-        const { comments, deleteComment } = this.props;
+        const { hasServerIssue } = this.state;
+        const { isAdmin, comments, deleteComment } = this.props;
 
         if (hasServerIssue) {
             return <ServerNotResponding />
@@ -108,12 +102,12 @@ class CommentSection extends Component {
                         comments.length
                         ? (comments.map(c =>
                             <Comment
-                                username={c.creator.username}
+                                author={c.creator.username}
                                 deleteComment={() => deleteComment(c._id)}
                                 key={c._id}
                                 id={c._id}
                                 content={c.content}
-                                creator={c.creator._id}
+                                creatorId={c.creator._id}
                                 isAdmin={isAdmin}
                             />)
                         ) : <h5>No comments yet...</h5>

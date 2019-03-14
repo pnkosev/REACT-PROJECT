@@ -1,6 +1,7 @@
 import React from 'react';
 import Input from '../common/Input';
 import withForm from '../hocs/WithForm';
+import withError from '../hocs/WithError';
 import userRegisterModel from '../../helpers/models/userRegisterModel'
 
 // class Register extends Component {
@@ -131,7 +132,5 @@ const RegisterBase = (props) => {
     );
 }
 
-const WithFormRegister = withForm(RegisterBase, userRegisterModel);
+const WithFormRegister = withError(withForm(RegisterBase, userRegisterModel));
 export default WithFormRegister;
-
-//export default withRouter(Register);

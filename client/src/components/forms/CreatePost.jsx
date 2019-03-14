@@ -1,6 +1,7 @@
 import React from 'react';
 import Input from '../common/Input';
 import withForm from '../hocs/WithForm';
+import withError from '../hocs/WithError';
 import postModel from '../../helpers/models/postModel';
 
 const CreatePost = (props) => {
@@ -30,5 +31,5 @@ const CreatePost = (props) => {
     );
 }
 
-const WithFormCreatePost = withForm(CreatePost, postModel);
+const WithFormCreatePost = withError(withForm(CreatePost, postModel));
 export default WithFormCreatePost;

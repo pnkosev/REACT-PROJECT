@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 
-import Input from '../common/Input';
+import Input from '../../common/Input';
 
-import notify from '../../helpers/notifier';
-import PostService from '../../services/post';
+import notify from '../../../helpers/data/notifier';
+import CommentService from '../../../services/comment';
 
-class EditPost extends Component {
+class EditComment extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            title: '',
             content: '',
             error: {}
         }
@@ -20,7 +18,7 @@ class EditPost extends Component {
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
     }
 
-    static service = new PostService();
+    static commentService = new CommentService();
 
     handleChange(e) {
         this.setState({
@@ -30,24 +28,18 @@ class EditPost extends Component {
 
     async handleFormSubmit(e) {
         e.preventDefault();
+        const { content } = this.state;
 
-        const post = Object.keys(this.state).reduce((object, key) => {
-            if (key !== 'error') {
-                object[key] = this.state[key]
-            }
-            return object;
-        }, {});
+        // let validationResult = this.props.validateForm(post);
 
-        let validationResult = this.props.validateForm(post);
-
-        if (!validationResult.success) {
-            notify('error', validationResult.message, validationResult.errors);
-            return;
-        }
+        // if (!validationResult.success) {
+        //     notify('error', validationResult.message, validationResult.errors);
+        //     return;
+        // }
 
         try {
-            const postId = this.props.match.params.postId;
-            const res = await EditPost.service.update(postId, post);
+            const commentId = this.props.match.params.commentId;
+            let res = await EditComment.commentService.updateComment(commentId, {content});
 
             if (!res.success) {
                 if (res.errors) {
@@ -55,7 +47,6 @@ class EditPost extends Component {
                         obj[key['param']] = key['msg']
                         return obj;
                     }, {})
-    
                     this.setState({ error: errors });
                     notify('error', 'Invalid input', errors);
                     return;
@@ -63,11 +54,9 @@ class EditPost extends Component {
                     notify('error', res.message);
                     return;
                 }
-                
-                //throw new Error(errors)
             } else {
                 notify('success', res.message);
-                this.props.history.push('/');
+                this.props.history.push('/comment/pending');
             }
         }
         catch (err) {
@@ -76,33 +65,22 @@ class EditPost extends Component {
     }
 
     componentDidMount() {
-        const postId = this.props.match.params.postId;
-        EditPost.service
-            .getById(postId)
+        const commentId = this.props.match.params.commentId;
+        EditComment.commentService
+            .getCommentById(commentId)
             .then(data => {
-                const isAuthor = data.post.creator._id === localStorage.getItem('userId') ? true : false;
-                if (!isAuthor) {
-                    return <Redirect to="/user/login" />
-                }
                 this.setState({
-                    title: data.post.title,
-                    content: data.post.content
+                    content: data.comment.content
                 })
             })
             .catch(err => console.log(err));
     }
+
     render() {
         return (
             <div className="container">
-                <h1>Edit Post</h1>
+                <h1>Edit Comment</h1>
                 <form onSubmit={this.handleFormSubmit}>
-                    <Input
-                        inputType="input"
-                        name="title"
-                        value={this.state.title}
-                        onChange={this.handleChange}
-                        label="Title"
-                    />
                     <Input
                         inputType={false}
                         name="content"
@@ -111,7 +89,7 @@ class EditPost extends Component {
                         onChange={this.handleChange}
                         label="Content"
                     />
-                    <br/>
+                    <br />
                     <input type="submit" className="btn btn-primary" value="Edit Post" />
                 </form>
             </div>
@@ -120,4 +98,4 @@ class EditPost extends Component {
 }
 
 //const WithFormUpdatePost = withForm(EditPost, postModel);
-export default EditPost;
+export default EditComment;

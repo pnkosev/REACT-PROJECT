@@ -1,4 +1,4 @@
-import { get, post } from '../helpers/requester';
+import { get, post } from '../helpers/data/requester';
 const host = `http://localhost:9999/`;
 
 

@@ -1,18 +1,16 @@
 import React, { Fragment } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 
-const Comment = ({ content, username, id, creator, status, isAdmin, deleteComment, approveComment }) => {
+const Comment = ({ content, author, id, creatorId, status, isAdmin, deleteComment, approveComment }) => {
     return (
         <li key={id}>
             <p>{content}</p>
-            <p>Author: {username}</p>
+            <p>Author: {author}</p>
             {
-                (creator.toString() === localStorage.getItem('userId') && !isAdmin)
+                (creatorId.toString() === localStorage.getItem('userId') && !isAdmin)
                 ? (
-                    <button  onClick={() => deleteComment(id)}>
-                        Delete
-                    </button>
+                    <button  onClick={() => deleteComment(id)}>Delete</button>
                 ) : (
                     null
                 )
@@ -27,12 +25,12 @@ const Comment = ({ content, username, id, creator, status, isAdmin, deleteCommen
                             <Fragment>
                                 <button onClick={() => approveComment(id)}>Approve</button>
                                 <button onClick={() => deleteComment(id)}>Delete</button>
-                                <button><Link to={`/comment/update/${id}`}>Edit</Link></button>
+                                <button><NavLink to={`/comment/update/${id}`} activeClassName="active">Edit</NavLink></button>
                             </Fragment>
                         ) : (
                             <Fragment>
                                 <button onClick={() => deleteComment(id)}>Delete</button>
-                                <button><Link to={`/comment/update/${id}`}>Edit</Link></button>
+                                <button><NavLink to={`/comment/update/${id}`} activeClassName="active">Edit</NavLink></button>
                             </Fragment>
                         )
                     }

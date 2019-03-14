@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { getProfile } from '../../services/auth';
+import { getProfile } from '../../../services/auth';
+import ServerNotResponding from '../Issue/SeverNotResponding';
+import withError from '../../hocs/WithError';
+import notify from '../../../helpers/data/notifier';
+import Post from '../Post/Post';
 
 class Profile extends Component {
     constructor(props) {
@@ -8,6 +11,7 @@ class Profile extends Component {
         this.state = {
             posts: [],
             hasFetched: false,
+            hasServerIssue: false,
         }
     }
 
@@ -17,16 +21,22 @@ class Profile extends Component {
                 this.setState({
                     posts: data.posts,
                     hasFetched: true,
-                })
+                });
+                notify('success', data.message);
             })
             .catch((err) => {
+                this.setState({ hasServerIssue: true });
                 console.log(err);
             })
     }
 
     render() {
-        const { posts, hasFetched } = this.state;
+        const { posts, hasFetched, hasServerIssue } = this.state;
         const username = localStorage.getItem('username');
+
+        if (hasServerIssue) {
+            return <ServerNotResponding />;
+        }
 
         return (
             <div>
@@ -43,13 +53,12 @@ class Profile extends Component {
                 {
                     posts.length
                         ? posts.map(p => (
-                            <article key={p._id}>
-                                <h2>{p.title}</h2>
-                                <div>{p.content}</div>
-                                <button>
-                                    <Link to={"/post/" + p._id}>Details</Link>
-                                </button>
-                            </article>))
+                            <Post key={p._id}
+                            title={p.title}
+                            content={p.content}
+                            id={p._id}
+                            author={p.creator.username}
+                        />))
                         : <h4>Currently no posts...</h4>
                 }
             </div>
@@ -57,4 +66,4 @@ class Profile extends Component {
     }
 }
 
-export default Profile;
+export default withError(Profile);
