@@ -10,7 +10,7 @@ import PrivateRoute from './components/hocs/PrivateRoute';
 import Home from './components/views/Home/Home';
 import HeaderWithUserContext from './components/common/Header';
 import Footer from './components/common/Footer';
-import PostDetailsWithUserContext from './components/views/Post/PostDetails';
+import PostDetailsWithUserContext from './components/views/Post/PostDetailsPage';
 import Profile from './components/views/User/Profile';
 import NotFound from './components/views/Issue/NotFound';
 

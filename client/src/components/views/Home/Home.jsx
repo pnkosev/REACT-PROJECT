@@ -45,17 +45,20 @@ class Home extends Component {
                     ? (<h2>Loading...</h2>)
                     : (<div>Posts:</div>)
                 }
+                <div className="cards-layout flex">
                 {
                     posts.length
                     ? posts.map(p => (
                         <Post key={p._id}
                             title={p.title}
                             content={p.content}
+                            imageUrl={p.imageUrl}
                             id={p._id}
                             author={p.creator.username}
                         />))
                     : <h2>Currently no posts...</h2>
                 }
+                </div>
             </div>
         )
     }

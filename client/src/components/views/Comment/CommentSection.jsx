@@ -9,6 +9,8 @@ import ErrorBoundary from '../../hocs/ErrorBoundary';
 
 import ServerNotResponding from '../Issue/SeverNotResponding';
 
+import '../../../styles/comment-section.css';
+
 class CommentSection extends Component {
     constructor(props) {
         super(props);
@@ -81,7 +83,9 @@ class CommentSection extends Component {
 
         return (
             <div className="container">
-                <h2>Leave a comment</h2>
+                <header className="comment-section">
+                    <h2>Leave a comment</h2>
+                </header>
                 <h4>Comment:</h4>
                 <form onSubmit={this.handleFormSubmit}>
                     <Input
@@ -95,7 +99,7 @@ class CommentSection extends Component {
                     <br/>
                     <input type="submit" className="btn btn-primary" value="Comment" />
                 </form>
-                <div>
+                <div className="comments">
                 <ErrorBoundary>
                     <h4>Comments:</h4>
                     {

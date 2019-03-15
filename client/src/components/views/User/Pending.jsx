@@ -31,7 +31,9 @@ class Pending extends Component {
     static commentService = new CommentService();
     static postService = new PostService();
 
-    async approveComment(id) {
+    async approveComment(e, id) {
+        e.preventDefault();
+
         try {
             let data = await Pending.commentService.approveComment(id);
 
@@ -48,7 +50,9 @@ class Pending extends Component {
         }
     }
 
-    async deleteComment(id) {
+    async deleteComment(e, id) {
+        e.preventDefault();
+
         try {
             let data = await Pending.commentService.deleteComment(id);
 
@@ -103,7 +107,9 @@ class Pending extends Component {
         }
     }
 
-    async approvePost(id) {
+    async approvePost(e, id) {
+        e.preventDefault();
+
         try {
             let data = await Pending.postService.approvePost(id);
 
@@ -120,7 +126,8 @@ class Pending extends Component {
         }
     }
 
-    async deletePost(id) {
+    async deletePost(e, id) {
+        e.preventDefault();
         try {
             let data = await Pending.postService.remove(id);
 
@@ -138,10 +145,8 @@ class Pending extends Component {
     }
 
     componentDidMount() {
-        const isAdmin = (localStorage.getItem('isAdmin') === 'true');
-        this.setState({ isAdmin });
-        this.getPendingComments();
         this.getPendingPosts();
+        this.getPendingComments();
     }
 
     componentDidUpdate(pP, pS) {
@@ -163,7 +168,7 @@ class Pending extends Component {
         }
 
         if (hasServerIssue) {
-            return <ServerNotResponding/>
+            return <ServerNotResponding/>;
         }
 
         return (
@@ -171,7 +176,7 @@ class Pending extends Component {
                 <div>
                     <ErrorBoundary>
                     <h3>Pending Posts:</h3>
-                    <ul>
+                    <div className="cards-layout flex">
                         {
                             posts.length
                             ? (
@@ -181,16 +186,17 @@ class Pending extends Component {
                                         isAdmin={isAdmin}
                                         title={p.title}
                                         content={p.content}
+                                        imageUrl={p.imageUrl}
                                         id={p._id}
                                         status={p.status}
-                                        deletePost={() => this.deletePost(p._id)}
-                                        approvePost={() => this.approvePost(p._id)}
+                                        deletePost={(e) => this.deletePost(e, p._id)}
+                                        approvePost={(e) => this.approvePost(e, p._id)}
                                     />)
                             ) : (
-                                <li>No posts to approve for now.</li>
+                                <p>No posts to approve for now.</p>
                             )
                         }
-                    </ul>
+                    </div>
                     </ErrorBoundary>
                 </div>
                 <div>
@@ -208,8 +214,8 @@ class Pending extends Component {
                                         id={c._id}
                                         creatorId={c.creator._id}
                                         status={c.status}
-                                        deleteComment={() => this.deleteComment(c._id)}
-                                        approveComment={() => this.approveComment(c._id)}
+                                        deleteComment={(e) => this.deleteComment(e, c._id)}
+                                        approveComment={(e) => this.approveComment(e, c._id)}
                                     />)
                             ) : (
                                 <li>No comments to approve for now.</li>

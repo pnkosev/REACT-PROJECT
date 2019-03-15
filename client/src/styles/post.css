@@ -1,0 +1,89 @@
+.cards-layout.flex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.post-card {
+    display: block;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-width: 15rem;
+    max-width: 25rem;
+    margin: 0.5rem;
+    background: #FFF;
+    box-shadow: 0 0 2rem 0.5rem rgba(0, 0, 0, 0.2);
+    border-radius: 0.3rem;
+    transition: box-shadow 0.3s ease;
+    border-radius: 0.3rem;
+}
+
+.post-card:hover {
+	box-shadow: 0 0 2.5rem 0.8rem rgba(0,0,0,0.25);
+}
+
+.post-card .media {
+    display: block;
+}
+
+.post-card .media img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.post-card .content {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-card .content h3 {
+    border-bottom: 2px solid rgb(150, 0, 150);
+    text-align: center;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    margin: 0;
+    padding: 0.5rem 1rem;
+}
+
+.post-card .content p.cnt {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 1rem;
+    padding: 1rem;
+}
+
+.post-card .content p.author {
+    text-align: right;
+    font-style: italic;
+    padding: 1rem;
+    margin-top: auto;
+}
+
+.post-card .content .btns {
+    display: flex;
+    flex-direction: row;
+}
+
+.post-card .content a {
+    display: inline-block;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    width: 4rem;
+    margin: 0.5rem auto;
+    text-align: center;
+    background: rgb(150, 0, 150);
+    color: rgb(255, 255, 255);
+    border-radius: 0.3rem; 
+}
+
+.post-card .content a:focus,
+.post-card .content a:hover {
+    background: lavender;
+    color: rgb(150, 0, 150);
+}

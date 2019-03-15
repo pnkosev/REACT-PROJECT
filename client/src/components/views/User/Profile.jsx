@@ -41,26 +41,29 @@ class Profile extends Component {
         return (
             <div>
                 <h2>{username}'s profile</h2>
+                <div>
+                    <p>Contribution:</p>
+                    Number of posts: {posts.length}
+                </div>
                 {
                     !hasFetched
                         ? (<h3>Loading...</h3>)
                         : (<h3>Your posts:</h3>)
                 }
-                <div>
-                    Contribution:
-                    Number of posts: {posts.length}
-                </div>
+                <div className="cards-layout flex">
                 {
                     posts.length
                         ? posts.map(p => (
                             <Post key={p._id}
                             title={p.title}
                             content={p.content}
+                            imageUrl={p.imageUrl}
                             id={p._id}
                             author={p.creator.username}
                         />))
                         : <h4>Currently no posts...</h4>
                 }
+                </div>
             </div>
         )
     }

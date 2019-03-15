@@ -18,6 +18,10 @@ router.post('/create', [
     .not().isEmpty()
     .isLength({ min: 50 })
     .withMessage('Please enter a valid content- minimum 50 chararcters.'),
+  body('imageUrl')
+    .not().isEmpty()
+    .matches(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)/)
+    .withMessage('Please provide a valid image URL.'),
 ],
 isAuth, postController.postCreatePost);
 
@@ -34,6 +38,10 @@ router.put('/update/:postId', [
     .not().isEmpty()
     .isLength({ min: 50 })
     .withMessage('Please enter a valid content- minimum 50 chararcters.'),
+  body('imageUrl')
+    .not().isEmpty()
+    .matches(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)/)
+    .withMessage('Please provide a valid image URL.'),
 ],
 isAuth || isInRole('Admin'), postController.updatePost);
 router.put('/approve/:postId', isInRole('Admin'), postController.approvePost);

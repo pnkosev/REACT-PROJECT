@@ -8,7 +8,7 @@ class Header extends Component {
         const { isLoggedIn, onLogout, username, isAdmin } = this.props;
 
         return (
-            <header>
+            <header className="nav">
                 <p className="title">Blog System</p>
                 {username ? <p className="welcome-msg">Welcome, {username}</p> : null }
                 <nav>

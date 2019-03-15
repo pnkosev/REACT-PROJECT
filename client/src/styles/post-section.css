@@ -1,0 +1,130 @@
+article.post-details {
+    display: flex;
+}
+
+article.post-details main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 20vh;
+    flex: 4 1 40rem;
+    padding: 2rem;
+}
+
+article.post-details aside {
+    min-height: 20vh;
+    flex: 1 1 20rem;
+    padding: 2rem;
+}
+
+article.post-details aside .likes-hates {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+article.post-details aside .stats {
+    display: flex;
+    flex-direction: wrap;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+article.post-details aside .stats span {
+    margin: 1rem 1rem 1rem 0;
+}
+
+article.post-details aside .btns {
+    display: flex;
+    flex-direction: wrap;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+article.post-details aside .ppl-likin ul,
+article.post-details aside .ppl-hatin ul {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+}
+
+article.post-details aside .ppl-likin ul li,
+article.post-details aside .ppl-hatin ul li {
+    display: block;
+    list-style: none outside;
+    margin: 0.5rem;
+    flex: 1 1 auto;
+}
+
+article.post-details main .media {
+    display: block;
+}
+
+article.post-details main .media img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+article.post-details main .content {
+    display: flex;
+    flex-direction: column;
+}
+
+article.post-details main .content h3 {
+    border-bottom: 2px solid rgb(150, 0, 150);
+    text-align: center;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    margin: 0;
+    padding: 2rem 1rem;
+}
+
+article.post-details main .content p {
+    max-width: 65rem;
+    padding: 2rem;
+    margin: auto 0;
+}
+
+article.post-details main .content p.author {
+    text-align: right;
+    font-style: italic;
+    padding: 0 0 2rem 0;
+    margin-top: auto;
+}
+
+article.post-details main .btns-author {
+    margin-bottom: 1rem
+}
+
+button,
+.btn {
+    display: inline-block;
+    position: relative;
+    font-size: 0.8rem;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    text-decoration: none;
+    outline: none;
+    padding: 0.5rem 1rem;
+    background: rgb(150, 0, 150);
+    color: rgb(255, 255, 255);
+    border-radius: 0.3rem; 
+    margin: 0 1rem 1rem 0;
+}
+
+button:focus,
+button:hover,
+.btn:focus,
+.btn:hover {
+    border-color: #060;
+	color: #060;
+	background: #FFF;
+}

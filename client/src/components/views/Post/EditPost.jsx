@@ -15,6 +15,7 @@ class EditPost extends Component {
         this.state = {
             title: '',
             content: '',
+            imageUrl: '',
             error: {},
             isAuthor: true,
             isAdmin: true,
@@ -86,6 +87,7 @@ class EditPost extends Component {
                 this.setState({
                     title: data.post.title,
                     content: data.post.content,
+                    imageUrl: data.post.imageUrl,
                     isAuthor,
                     isAdmin,
                 })
@@ -120,6 +122,13 @@ class EditPost extends Component {
                         onChange={this.handleChange}
                         label="Content"
                     />
+                    <Input
+                    inputType="input"
+                    name="imageUrl"
+                    value={this.state.imageUrl}
+                    onChange={this.handleChange}
+                    label="ImageUrl"
+                />
                     <br/>
                     <input type="submit" className="btn btn-primary" value="Edit Post" />
                 </form>

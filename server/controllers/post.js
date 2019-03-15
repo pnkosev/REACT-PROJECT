@@ -64,11 +64,12 @@ module.exports = {
 	},
 	postCreatePost: (req, res, next) => {
 		if (validatePost(req, res)) {
-			const { title, content } = req.body;
+			const { title, content, imageUrl } = req.body;
 
 			const post = new Post({
 				title,
 				content,
+				imageUrl,
 				creator: req.userId
 			});
 
@@ -186,7 +187,7 @@ module.exports = {
 		// Return 422 with errors array if something went wrong
 		if (validatePost(req, res)) {
 			const postId = req.params.postId;
-			const { title, content } = req.body;
+			const { title, content, imageUrl } = req.body;
 
 			Post
 				.findById(postId)
@@ -207,6 +208,7 @@ module.exports = {
 
 					p.title = title;
 					p.content = content;
+					p.imageUrl = imageUrl;
 
 					return p.save();
 				})

@@ -24,6 +24,13 @@ const CreatePost = (props) => {
                     onChange={props.handleChange}
                     label="Content"
                 />
+                <Input
+                    inputType="input"
+                    name="imageUrl"
+                    value={props.imageUrl}
+                    onChange={props.handleChange}
+                    label="ImageUrl"
+                />
                 <br/>
                 <input type="submit" className="btn btn-primary" value="Create Post" />
             </form>
