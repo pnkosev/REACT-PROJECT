@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 
-import Input from '../../common/Input';
-
+import { UserConsumer } from '../../contexts/UserContext';
 import notify from '../../../helpers/data/notifier';
+import validateForm from '../../../helpers/formValidators/createPostValidator';
 import PostService from '../../../services/post';
+
 import withError from '../../hocs/WithError';
 import ServerNotResponding from '../Issue/SeverNotResponding';
-import { UserConsumer } from '../../contexts/UserContext';
-
-import validateForm from '../../../helpers/formValidators/createPostValidator';
+import Input from '../../common/Input';
 
 class EditPost extends Component {
     constructor(props) {
@@ -21,6 +20,7 @@ class EditPost extends Component {
             imageUrl: '',
             error: {},
             isAuthor: true,
+            hasFetched: false,
             hasServerIssue: false,
         }
 
@@ -28,7 +28,7 @@ class EditPost extends Component {
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
     }
 
-    static service = new PostService();
+    static postService = new PostService();
 
     handleChange(e) {
         this.setState({
@@ -51,7 +51,7 @@ class EditPost extends Component {
 
         try {
             const postId = this.props.match.params.postId;
-            const res = await EditPost.service.update(postId, post);
+            const res = await EditPost.postService.update(postId, post);
 
             if (!res.success) {
                 if (res.errors) {
@@ -59,7 +59,6 @@ class EditPost extends Component {
                         obj[key['param']] = key['msg']
                         return obj;
                     }, {})
-    
                     this.setState({ error: errors });
                     notify('error', 'Invalid input', errors);
                     return;
@@ -67,7 +66,6 @@ class EditPost extends Component {
                     notify('error', res.message);
                     return;
                 }
-                
             } else {
                 const prevPath = this.props.location.state.prevPath;
                 notify('success', res.message);
@@ -84,24 +82,34 @@ class EditPost extends Component {
         }
     }
 
-    componentDidMount() {
+    async getData() {
         const postId = this.props.match.params.postId;
-        EditPost.service
-            .getById(postId)
-            .then(data => {
+        try {
+            let data = await EditPost.postService.getById(postId);
+            if (!data.success) {
+                throw new Error(data.message);
+            } else {
                 const isAuthor = data.post.creator._id === localStorage.getItem('userId') ? true : false;
                 this.setState({
                     title: data.post.title,
                     content: data.post.content,
                     imageUrl: data.post.imageUrl,
                     isAuthor,
+                    hasFetched: true,
                 })
-            })
-            .catch(err => console.log(err));
+            }
+        } catch (err) {
+            this.setState({ hasServerIssue: true });
+            console.log(err);
+        }
     }
-    
+
+    componentDidMount() {
+        this.getData();
+    }
+
     render() {
-        const { isAuthor, hasServerIssue, title, content, imageUrl } = this.state;
+        const { isAuthor, hasFetched, hasServerIssue, title, content, imageUrl } = this.state;
         const { isAdmin } = this.props;
 
         if (!isAuthor && !isAdmin) {
@@ -115,45 +123,50 @@ class EditPost extends Component {
         return (
             <div className="container">
                 <h1>Edit Post</h1>
-                <form onSubmit={this.handleFormSubmit}>
-                    <Input
-                        inputType="input"
-                        name="title"
-                        value={title}
-                        onChange={this.handleChange}
-                        label="Title"
-                    />
-                    <Input
-                        inputType={false}
-                        name="content"
-                        type="text"
-                        value={content}
-                        onChange={this.handleChange}
-                        label="Content"
-                    />
-                    <Input
-                        inputType="input"
-                        name="imageUrl"
-                        value={imageUrl}
-                        onChange={this.handleChange}
-                        label="ImageUrl"
-                    />
-                    <br/>
-                    {
-                        isAdmin
+                {
+                    !hasFetched
                         ? (
-                            <input type="submit" className="btn btn-primary" value="Edit and Approve" />
+                            <h2>Loading...</h2>
                         ) : (
-                            <input type="submit" className="btn btn-primary" value="Edit Post" />
+                            <form onSubmit={this.handleFormSubmit}>
+                                <Input
+                                    inputType="input"
+                                    name="title"
+                                    value={title}
+                                    onChange={this.handleChange}
+                                    label="Title"
+                                />
+                                <Input
+                                    inputType={false}
+                                    name="content"
+                                    type="text"
+                                    value={content}
+                                    onChange={this.handleChange}
+                                    label="Content"
+                                />
+                                <Input
+                                    inputType="input"
+                                    name="imageUrl"
+                                    value={imageUrl}
+                                    onChange={this.handleChange}
+                                    label="ImageUrl"
+                                />
+                                <br />
+                                {
+                                    isAdmin
+                                        ? (
+                                            <input type="submit" className="btn btn-primary" value="Edit and Approve" />
+                                        ) : (
+                                            <input type="submit" className="btn btn-primary" value="Edit Post" />
+                                        )
+                                }
+                            </form>
                         )
-                    }
-                </form>
+                }
             </div>
         )
     }
 }
-
-//export default withError(EditPost);
 
 const WithErrorEditPost = withError(EditPost);
 

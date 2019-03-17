@@ -62,16 +62,15 @@ const withForm = (WrappedComponent, model) => {
                 } else {
                     if (res.token) {
                         localStorage.setItem('authToken', res.token);
-                        localStorage.setItem('username', res.username);
                         localStorage.setItem('userId', res.userId);
-                        localStorage.setItem('isAdmin', res.isAdmin);
-
+                        
                         let user = {
                             isLoggedIn: res.success,
-                            username: res.username,
                             isAdmin: res.isAdmin,
+                            username: res.username,
                         }
-
+                        
+                        localStorage.setItem('user', JSON.stringify(user));
                         this.props.updateUser(user);
                     }
 
@@ -111,7 +110,5 @@ const withForm = (WrappedComponent, model) => {
         }
     };
 }
-    
-
 
 export default withForm;

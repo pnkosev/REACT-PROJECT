@@ -1,7 +1,7 @@
 import React from 'react';
 import Input from '../common/Input';
 
-//import withError from '../hocs/WithError';
+import withError from '../hocs/WithError';
 import withForm from '../hocs/WithForm';
 
 import commentModel from '../../helpers/models/commentModel';
@@ -23,4 +23,4 @@ const CreateComment = (props) => {
 
 const WithFormCreateComment = withForm(CreateComment, commentModel);
 
-export default WithFormCreateComment
+export default withError(WithFormCreateComment);

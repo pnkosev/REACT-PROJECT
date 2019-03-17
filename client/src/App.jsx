@@ -4,17 +4,18 @@ import toastr from 'toastr';
 
 import './styles/typography.css'
 
-import AdminRoute from './components/hocs/AdminRoute';
-import PrivateRoute from './components/hocs/PrivateRoute';
+import AdminRouteWithUserContext from './components/hocs/AdminRoute';
+import PrivateRouteWithUserContext from './components/hocs/PrivateRoute';
 
 import Home from './components/views/Home/Home';
 import HeaderWithUserContext from './components/common/Header';
 import Footer from './components/common/Footer';
 import PostDetailsWithUserContext from './components/views/Post/PostDetailsPage';
-import Profile from './components/views/User/Profile';
+import WithUserContextProfile from './components/views/User/Profile';
 import NotFound from './components/views/Issue/NotFound';
 
 import { postRegister, postLogin } from './services/auth';
+import PostService from './services/post';
 
 import notify from './helpers/data/notifier';
 
@@ -22,15 +23,13 @@ import validateRegisterForm from './helpers/formValidators/registerFormValidator
 import validateLoginForm from './helpers/formValidators/loginFormValidator';
 import validateCreatePostForm from './helpers/formValidators/createPostValidator';
 
+import { UserProvider, defaultUserState } from './components/contexts/UserContext';
 import WithFormRegister from './components/forms/Register';
-import LoginWithContext from './components/forms/Login';
+import WithFormLogin from './components/forms/Login';
 import WithFormCreatePost from './components/forms/CreatePost';
 import EditPostWithContext from './components/views/Post/EditPost';
 import EditCommentWithContext from './components/views/Comment/EditComment';
 import PendingWithUserContext from './components/views/User/Pending';
-
-import { UserProvider, defaultUserState } from './components/contexts/UserContext';
-import PostService from './services/post';
 
 toastr.options.newestOnTop = false;
 toastr.options.closeButton = true;
@@ -38,10 +37,13 @@ toastr.options.closeButton = true;
 class App extends Component {
 	constructor(props) {
 		super(props);
+		const hasUser = localStorage.getItem('user');
+		const parsedUser = hasUser ? JSON.parse(hasUser) : {};
 
 		this.state = {
 			user: {
-				...defaultUserState
+				...defaultUserState,
+				...parsedUser,
 			}
 		};
 
@@ -64,18 +66,6 @@ class App extends Component {
 			user: { ...defaultUserState }
 		})
 		this.props.history.push('/');
-	}
-
-	componentDidMount() {
-		const isLoggedIn = localStorage.getItem('authToken') !== null;
-		const username = localStorage.getItem('username');
-		const isAdmin = localStorage.getItem('isAdmin') === 'true';
-		let user = {
-			isLoggedIn,
-			username,
-			isAdmin
-		};
-		this.updateUser(user);
 	}
 
 	render() {
@@ -101,22 +91,22 @@ class App extends Component {
 							/>
 						} />
 						<Route path="/user/login" exact render={(props) =>
-							<LoginWithContext
+							<WithFormLogin
 								request={postLogin}
 								validateForm={validateLoginForm}
 								updateUser={this.updateUser}
 								{...props}
 							/>
 						} />
-						<PrivateRoute path="/user/profile" exact render={(props) =>
-							<Profile
+						<PrivateRouteWithUserContext path="/user/profile" exact render={(props) =>
+							<WithUserContextProfile
 								{...props}
 							/>
 						} />
-						<AdminRoute path="/user/admin/work" exact render={(props) =>
+						<AdminRouteWithUserContext path="/user/admin/work" exact render={(props) =>
 							<PendingWithUserContext {...props} />
 						} />
-						<PrivateRoute path="/post/create" exact render={(props) =>
+						<PrivateRouteWithUserContext path="/post/create" exact render={(props) =>
 							<WithFormCreatePost
 								request={(p) => App.postService.postCreate(p)}
 								validateForm={validateCreatePostForm}
@@ -128,12 +118,12 @@ class App extends Component {
 								{...props}
 							/>
 						} />
-						<PrivateRoute path="/post/update/:postId" exact render={(props) =>
+						<PrivateRouteWithUserContext path="/post/update/:postId" exact render={(props) =>
 							<EditPostWithContext
 								{...props}
 							/>
 						} />
-						<Route path="/comment/update/:commentId" exact render={(props) =>
+						<AdminRouteWithUserContext path="/comment/update/:commentId" exact render={(props) =>
 							<EditCommentWithContext
 								{...props}
 							/>

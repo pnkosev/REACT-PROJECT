@@ -6,6 +6,7 @@ import '../../../styles/post.css';
 
 const Post = (props) => {
     const { title, content, imageUrl, author, id, status, isAdmin, approvePost, deletePost } = props;
+
     return (
         <article>
             <div className="post-card">

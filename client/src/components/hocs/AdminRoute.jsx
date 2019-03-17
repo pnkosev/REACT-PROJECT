@@ -1,18 +1,32 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import notify from '../../helpers/data/notifier';
+import { UserConsumer } from '../contexts/UserContext';
 
-class AdminRoute extends Component {
-    render() {
-        if (localStorage.getItem('isAdmin') !== 'true') {
-            notify('error', 'You have to be admin to have access.');
-            return <Redirect to="/user/login" />;
-        };
+const AdminRoute = (props) => {
+    if (!props.isAdmin) {
+        notify('error', 'You have to be admin to have access.');
+        return <Redirect to="/user/login" />;
+    };
 
-        return (
-            <Route {...this.props}/>
-        );
-    }
+    return (
+        <Route {...props}/>
+    );
 }
 
-export default AdminRoute;
+const AdminRouteWithUserContext = (props) => {
+    return (
+        <UserConsumer>
+            {
+                (user) => (
+                    <AdminRoute
+                        {...props}
+                        isAdmin={user.isAdmin}
+                    />
+                )
+            }
+        </UserConsumer>
+    )
+}
+
+export default AdminRouteWithUserContext;

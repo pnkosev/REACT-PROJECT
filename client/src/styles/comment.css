@@ -12,6 +12,15 @@ li.comment {
     flex: 1 1 auto;
 }
 
+ul.comments {
+    padding: 0;
+}
+
+li.no-comment {
+    display: block;
+    list-style: none outside;
+}
+
 li.comment p {
     padding-bottom: 1rem;
 }

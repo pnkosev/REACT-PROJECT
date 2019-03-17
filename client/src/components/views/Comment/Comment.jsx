@@ -6,6 +6,7 @@ import '../../../styles/comment.css';
 
 const Comment = (props) => {
     const { content, author, id, creatorId, status, isAdmin, deleteComment, approveComment } = props;
+    
     return (
         <li className="comment" key={id}>
             <p>{content}</p>

@@ -3,7 +3,6 @@ import PostService from '../../../services/post';
 import notify from '../../../helpers/data/notifier';
 import CommentSection from '../Comment/CommentSection';
 import ServerNotResponding from '../Issue/SeverNotResponding';
-import ErrorBoundary from '../../hocs/ErrorBoundary';
 import CommentService from '../../../services/comment';
 import { UserConsumer } from '../../contexts/UserContext';
 import PostSection from './PostSection';
@@ -18,24 +17,21 @@ class PostDetails extends Component {
             hasFetched: false,
             isAuthor: false,
             comments: [],
-            hasServerIssue: false,
+            hasServerIssuePosts: false,
+            hasServerIssueComms: false,
+            hasGeneralServerIssue: false,
         }
 
         this.deletePost = this.deletePost.bind(this);
         this.likePost = this.likePost.bind(this);
         this.hatePost = this.hatePost.bind(this);
-        this.deleteComment = this.deleteComment.bind(this);
 
+        this.deleteComment = this.deleteComment.bind(this);
         this.updateComms = this.updateComms.bind(this);
-        //this.postComment = this.postComment.bind(this);
     }
 
     static postService = new PostService();
     static commentService = new CommentService();
-
-    // async postComment(creds, id) {
-    //     return await PostDetails.commentService.postComment(creds, id);
-    // }
 
     updateComms(res) {
         if (res.comment.status === 'Approved') {
@@ -45,21 +41,19 @@ class PostDetails extends Component {
         }
     }
 
-    deletePost(id) {
-        PostDetails.postService
-            .remove(id)
-            .then((res) => {
-                if (!res.success) {
-                    throw new Error(res.message);
-                } else {
-                    notify('success', res.message)
-                    this.props.history.push('/');
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({ hasServerIssue: true });
-            });
+    async deletePost(id) {
+        try {
+            let res = await PostDetails.postService.remove(id);
+            if (!res.success) {
+                throw new Error(res.message);
+            } else {
+                notify('success', res.message)
+                this.props.history.push('/');
+            }
+        } catch (err) {
+            console.log(err);
+            this.setState({ hasServerIssuePosts: true });
+        }
     }
 
     async likePost(id) {
@@ -75,7 +69,7 @@ class PostDetails extends Component {
             }
         } catch (err) {
             console.log(err);
-            this.setState({ hasServerIssue: true });
+            this.setState({ hasServerIssuePosts: true });
         }
     }
 
@@ -92,7 +86,7 @@ class PostDetails extends Component {
             }
         } catch (err) {
             console.log(err);
-            this.setState({ hasServerIssue: true });
+            this.setState({ hasServerIssuePosts: true });
         }
     }
 
@@ -112,40 +106,42 @@ class PostDetails extends Component {
             }
 
         } catch (err) {
-            this.setState({ hasServerIssue: true });
             console.log(err);
+            this.setState({ hasServerIssueComms: true });
+        }
+    }
+
+    async getData() {
+        const { isLoggedIn } = this.props;
+        const postId = this.props.match.params.postId;
+        try {
+            let data = await PostDetails.postService.getById(postId);
+            let isAuthor;
+            if (isLoggedIn) {
+                isAuthor = data.post.creator._id === localStorage.getItem('userId') ? true : false;
+            }
+            this.setState({
+                post: data.post,
+                isAuthor,
+                comments: data.post.comments,
+                hasFetched: true,
+            })
+        } catch (err) {
+            console.log(err);
+            this.setState({ hasGeneralServerIssue: true });
         }
     }
 
     componentDidMount() {
-        const { isLoggedIn } = this.props;
-        const postId = this.props.match.params.postId;
-        PostDetails.postService
-            .getById(postId)
-            .then(data => {
-                let isAuthor;
-                if (isLoggedIn) {
-                    isAuthor = data.post.creator._id === localStorage.getItem('userId') ? true : false;
-                }
-                this.setState({
-                    post: data.post,
-                    isAuthor,
-                    comments: data.post.comments,
-                    hasFetched: true,
-                })
-            })
-            .catch(err => {
-                console.log(err);
-                this.setState({ hasServerIssue: true });
-            });
+        this.getData();
     }
 
     render() {
-        const { post, hasFetched, isAuthor, comments, hasServerIssue } = this.state;
+        const { post, hasFetched, isAuthor, comments, hasServerIssuePosts, hasServerIssueComms, hasGeneralServerIssue } = this.state;
         const { isAdmin, isLoggedIn } = this.props;
 
-        if (hasServerIssue) {
-            return <ServerNotResponding />
+        if (hasGeneralServerIssue) {
+            return <ServerNotResponding />;
         }
 
         return (
@@ -164,22 +160,22 @@ class PostDetails extends Component {
                                 deletePost={this.deletePost}
                                 likePost={this.likePost}
                                 hatePost={this.hatePost}
+                                serverIssue={hasServerIssuePosts}
                             />
                             {
                                 isLoggedIn
                                     ? (
-                                        <ErrorBoundary>
-                                            <CommentSection
-                                                {...this.props}
-                                                isAdmin={isAdmin}
-                                                postId={post._id}
-                                                comments={comments}
-                                                deleteComment={this.deleteComment}
-                                                postComment={(creds, id) => PostDetails.commentService.postComment(creds, id)}
-                                                updateComms={(res) => this.updateComms(res)}
-                                                validateForm={commentValidateForm}
-                                            />
-                                        </ErrorBoundary>
+                                        <CommentSection
+                                            {...this.props}
+                                            isAdmin={isAdmin}
+                                            postId={post._id}
+                                            comments={comments}
+                                            deleteComment={this.deleteComment}
+                                            postComment={(creds, id) => PostDetails.commentService.postComment(creds, id)}
+                                            updateComms={(res) => this.updateComms(res)}
+                                            validateForm={commentValidateForm}
+                                            serverIssue={hasServerIssueComms}
+                                        />
                                     ) : (
                                         null
                                     )

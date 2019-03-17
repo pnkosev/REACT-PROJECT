@@ -1,13 +1,16 @@
 import React, { Component, Fragment } from 'react';
-import CommentService from '../../../services/comment';
+
 import notify from '../../../helpers/data/notifier';
+import { UserConsumer } from '../../contexts/UserContext';
+import CommentService from '../../../services/comment';
+import PostService from '../../../services/post';
+
+import withError from '../../hocs/WithError';
+import ErrorBoundary from '../../hocs/ErrorBoundary';
+
 import ServerNotResponding from '../Issue/SeverNotResponding';
 import Comment from '../Comment/Comment';
-import ErrorBoundary from '../../hocs/ErrorBoundary';
-import PostService from '../../../services/post';
 import Post from '../Post/Post';
-import { UserConsumer } from '../../contexts/UserContext';
-import withError from '../../hocs/WithError';
 
 class Pending extends Component {
     constructor(props) {
@@ -202,7 +205,7 @@ class Pending extends Component {
                 <div>
                     <ErrorBoundary>
                     <h3>Pending Comments:</h3>
-                    <ul>
+                    <ul className="comments">
                         {
                             comments.length
                             ? (
@@ -219,7 +222,7 @@ class Pending extends Component {
                                         approveComment={this.approveComment}
                                     />)
                             ) : (
-                                <li>No comments to approve for now.</li>
+                                <li className="no-comment" >No comments to approve for now.</li>
                             )
                         }
                     </ul>

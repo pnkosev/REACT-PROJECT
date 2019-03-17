@@ -4,9 +4,14 @@ import { NavLink } from 'react-router-dom';
 import withError from '../../hocs/WithError';
 
 import '../../../styles/post-section.css';
+import ServerNotResponding from '../Issue/SeverNotResponding';
 
 const PostSection = (props) => {
-    const { post, isAuthor, isAdmin, isLoggedIn, deletePost, likePost, hatePost } = props;
+    const { post, isAuthor, isAdmin, isLoggedIn, deletePost, likePost, hatePost, serverIssue } = props;
+
+    if (serverIssue) {
+        return <ServerNotResponding />;
+    }
 
     return (
         <article className="post-details">
@@ -88,4 +93,5 @@ const PostSection = (props) => {
         </article>
     );
 }
+
 export default withError(PostSection);
