@@ -27,6 +27,7 @@ const withForm = (WrappedComponent, model) => {
 
         async handleFormSubmit(e) {
             e.preventDefault();
+
             const credentials = getRequestData(this.state, model.defaultState);
 
             let validationResult = this.props.validateForm(credentials);
@@ -34,10 +35,16 @@ const withForm = (WrappedComponent, model) => {
             if (!validationResult.success) {
                 notify('error', validationResult.message, validationResult.errors);
                 return;
+            } else {
+                e.target.reset();
             }
 
             try {
-                const res = await this.props.request(credentials);
+                const res = await this.props.request(credentials, this.props.postId);
+
+                if (!res) {
+                    return;
+                }
 
                 if (!res.success) {
                     if (res.errors) {
@@ -64,10 +71,21 @@ const withForm = (WrappedComponent, model) => {
                             username: res.username,
                             isAdmin: res.isAdmin,
                         }
+
                         this.props.updateUser(user);
                     }
+
+                    if (res.comment) {
+                        this.props.updateComms(res);
+                    }
+                    
                     notify('success', res.message);
-                    this.props.history.push('/');
+
+                    const curPath = this.props.location.pathname;
+                    
+                    if (!curPath.includes('details')) {
+                        this.props.history.push('/');
+                    }
                 }
             }
             catch (err) {

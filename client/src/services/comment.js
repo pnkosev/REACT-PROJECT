@@ -6,7 +6,7 @@ class CommentService {
         this.baseUrl = `${host}comment/`;
     }
 
-    postComment(id, content) {
+    postComment(content, id) {
         return post(this.baseUrl + id + '/create', content);
     }
 

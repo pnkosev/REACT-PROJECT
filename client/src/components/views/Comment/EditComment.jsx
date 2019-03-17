@@ -4,6 +4,10 @@ import Input from '../../common/Input';
 
 import notify from '../../../helpers/data/notifier';
 import CommentService from '../../../services/comment';
+import { UserConsumer } from '../../contexts/UserContext';
+import withError from '../../hocs/WithError';
+
+import validateForm from '../../../helpers/formValidators/commentValidator';
 
 class EditComment extends Component {
     constructor(props) {
@@ -30,15 +34,16 @@ class EditComment extends Component {
         e.preventDefault();
         const { content } = this.state;
 
-        // let validationResult = this.props.validateForm(post);
+        let validationResult = validateForm({content});
 
-        // if (!validationResult.success) {
-        //     notify('error', validationResult.message, validationResult.errors);
-        //     return;
-        // }
+        if (!validationResult.success) {
+            notify('error', validationResult.message, validationResult.errors);
+            return;
+        }
 
         try {
             const commentId = this.props.match.params.commentId;
+
             let res = await EditComment.commentService.updateComment(commentId, {content});
 
             if (!res.success) {
@@ -55,8 +60,9 @@ class EditComment extends Component {
                     return;
                 }
             } else {
+                const prevPath = this.props.location.state.prevPath;
                 notify('success', res.message);
-                this.props.history.push('/comment/pending');
+                this.props.history.push(prevPath);
             }
         }
         catch (err) {
@@ -77,6 +83,7 @@ class EditComment extends Component {
     }
 
     render() {
+        const { isAdmin } = this.props;
         return (
             <div className="container">
                 <h1>Edit Comment</h1>
@@ -90,12 +97,30 @@ class EditComment extends Component {
                         label="Content"
                     />
                     <br />
-                    <input type="submit" className="btn btn-primary" value="Edit Post" />
+                    {
+                        isAdmin
+                        ? (<input type="submit" className="btn btn-primary" value="Edit and Approve" />)
+                        : (<input type="submit" className="btn btn-primary" value="Edit Comment" />)
+                    }
                 </form>
             </div>
         )
     }
 }
 
-//const WithFormUpdatePost = withForm(EditPost, postModel);
-export default EditComment;
+const EditCommentWithContext = (props) => {
+    return (
+        <UserConsumer>
+            {
+                (user) => (
+                    <EditComment
+                        {...props}
+                        isAdmin={user.isAdmin}
+                    />
+                )
+            }
+        </UserConsumer>
+    )
+}
+
+export default withError(EditCommentWithContext);

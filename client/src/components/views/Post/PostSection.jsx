@@ -23,7 +23,12 @@ const PostSection = (props) => {
                     isAuthor || isAdmin
                         ? (
                             <div className="btns-author">
-                                <NavLink to={`/post/update/${post._id}`} className="btn" >Edit</NavLink>
+                                <NavLink
+                                    to={{pathname: `/post/update/${post._id}`, state: { prevPath: props.location.pathname }}}
+                                    className="btn"
+                                >
+                                    Edit
+                                </NavLink>
                                 <button onClick={() => deletePost(post._id)} className="btn" >Delete</button>
                             </div>
                         ) : (

@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 
-import Input from '../../common/Input';
 import Comment from './Comment';
-
-import notify from '../../../helpers/data/notifier';
-import CommentService from '../../../services/comment';
+import WithFormCreateComment from '../../forms/CreateComment';
+import ServerNotResponding from '../Issue/SeverNotResponding';
 import ErrorBoundary from '../../hocs/ErrorBoundary';
 
-import ServerNotResponding from '../Issue/SeverNotResponding';
+import CommentService from '../../../services/comment';
 
 import '../../../styles/comment-section.css';
 
@@ -16,66 +14,16 @@ class CommentSection extends Component {
         super(props);
 
         this.state = {
-            content: '',
             error: {},
             hasServerIssue: false,
         }
-
-        this.handleChange = this.handleChange.bind(this);
-        this.handleFormSubmit = this.handleFormSubmit.bind(this);
     }
 
-    static commentService = new CommentService();
-
-    handleChange(e) {
-        this.setState({
-            [e.target.name]: e.target.value
-        });
-    }
-
-    async handleFormSubmit(e) {
-        e.preventDefault();
-        const content = this.state.content;
-        
-        // TODO validate form
-        // let validationResult = this.props.validateForm(comment);
-        
-        // if (!validationResult.success) {
-        //     notify('error', validationResult.message, validationResult.errors);
-        //     return;
-        // }
-        
-        try {
-            const postId = this.props.postId;
-            let res = await CommentSection.commentService.postComment(postId, {content});
-
-            if (!res.success) {
-                if (res.errors) {
-                    const errors = (res.errors).reduce((obj, key) => {
-                        obj[key['param']] = key['msg']
-                        return obj;
-                    }, {})
-    
-                    this.setState({ error: errors });
-                    notify('error', 'Invalid input', errors);
-                    return;
-                } else {
-                    notify('error', res.message);
-                    return;
-                }
-            } else {
-                this.setState({ content: '' })
-                notify('success', res.message);
-            }
-        } catch(err) {
-            this.setState({ hasServerIssue: true });
-            console.log(err);
-        };
-    }
+    //static commentService = new CommentService();
 
     render() {
         const { hasServerIssue } = this.state;
-        const { isAdmin, comments, deleteComment } = this.props;
+        const { isAdmin, comments, deleteComment, postId, postComment, updateComms, validateForm } = this.props;
 
         if (hasServerIssue) {
             return <ServerNotResponding />
@@ -87,39 +35,36 @@ class CommentSection extends Component {
                     <h2>Leave a comment</h2>
                 </header>
                 <h4>Comment:</h4>
-                <form onSubmit={this.handleFormSubmit}>
-                    <Input
-                        inputType={false}
-                        name="content"
-                        type="text"
-                        value={this.state.content}
-                        onChange={this.handleChange}
-                        label="Content"
-                        />
-                    <br/>
-                    <input type="submit" className="btn btn-primary" value="Comment" />
-                </form>
+                <WithFormCreateComment
+                    {...this.props}
+                    postId={postId}
+                    request={postComment}
+                    updateComms={updateComms}
+                    //request={(creds, id) => CommentSection.commentService.postComment(creds, id)}
+                    validateForm={validateForm}
+                />
                 <div className="comments">
-                <ErrorBoundary>
                     <h4>Comments:</h4>
-                    {
-                        comments.length
-                        ? (comments.map(c =>
-                            <Comment
-                                author={c.creator.username}
-                                deleteComment={() => deleteComment(c._id)}
-                                key={c._id}
-                                id={c._id}
-                                content={c.content}
-                                creatorId={c.creator._id}
-                                isAdmin={isAdmin}
-                            />)
-                        ) : <h5>No comments yet...</h5>
-                    }
-                </ErrorBoundary> 
+                    <ErrorBoundary>
+                        {
+                            comments.length
+                                ? (comments.map(c =>
+                                    <Comment
+                                        {...this.props}
+                                        author={c.creator.username}
+                                        deleteComment={deleteComment}
+                                        key={c._id}
+                                        id={c._id}
+                                        content={c.content}
+                                        creatorId={c.creator._id}
+                                        isAdmin={isAdmin}
+                                    />)
+                                ) : <h5>No comments yet...</h5>
+                        }
+                    </ErrorBoundary>
                 </div>
             </div>
-         );
+        );
     }
 }
 export default CommentSection;

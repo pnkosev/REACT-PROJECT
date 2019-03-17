@@ -112,15 +112,28 @@ module.exports = {
 
 		User
 			.findById(userId)
-			.populate('posts')
+			.populate({
+				path: 'posts',
+				match: { status:  'Approved' }
+			})
 			.then(user => {
-				res
-					.status(200)
-					.json({
-						success: true,
-						message: `Here are your posts, ${user.username}!`,
-						posts: user.posts
-				});
+				if (user.posts.length) {
+					res
+						.status(200)
+						.json({
+							success: true,
+							message: `Here are your posts, ${user.username}!`,
+							posts: user.posts
+					});
+				} else {
+					res
+						.status(200)
+						.json({
+							success: true,
+							message: `Currently you have no posts, ${user.username}!`,
+							posts: user.posts
+					});
+				}
 			})
 			.catch(error => {
 				if (!error.statusCode) {

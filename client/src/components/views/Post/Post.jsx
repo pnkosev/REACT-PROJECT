@@ -4,7 +4,8 @@ import { NavLink } from 'react-router-dom';
 import '../../../styles/post.css';
 
 
-const Post = ({ title, content, imageUrl, author, id, status, isAdmin, approvePost, deletePost }) => {
+const Post = (props) => {
+    const { title, content, imageUrl, author, id, status, isAdmin, approvePost, deletePost } = props;
     return (
         <article>
             <div className="post-card">
@@ -25,15 +26,20 @@ const Post = ({ title, content, imageUrl, author, id, status, isAdmin, approvePo
                                     <div className="btns">
                                         <a href="/" onClick={(e) => approvePost(e, id)}>Approve</a>
                                         <a href="/" onClick={(e) => deletePost(e, id)}>Delete</a>
-                                        <NavLink to={`/post/update/${id}`} activeClassName="active">Edit</NavLink>
+                                        <NavLink
+                                            to={{pathname: `/post/update/${id}`, state: { prevPath: props.location.pathname }}}
+                                            activeClassName="active"
+                                        >
+                                            Edit
+                                        </NavLink>
                                     </div>
                                 ) : (
-                                    <NavLink to={"/post/" + id} activeClassName="active">Details</NavLink>
+                                    <NavLink to={"/post/details/" + id} activeClassName="active">Details</NavLink>
                                 )
                             }
                             </Fragment>
                         ) : (
-                            <NavLink to={"/post/" + id} activeClassName="active">Details</NavLink>
+                            <NavLink to={"/post/details/" + id} activeClassName="active">Details</NavLink>
                         )
                     }
                 </div>

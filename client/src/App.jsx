@@ -25,8 +25,8 @@ import validateCreatePostForm from './helpers/formValidators/createPostValidator
 import WithFormRegister from './components/forms/Register';
 import LoginWithContext from './components/forms/Login';
 import WithFormCreatePost from './components/forms/CreatePost';
-import EditPost from './components/views/Post/EditPost';
-import EditComment from './components/views/Comment/EditComment';
+import EditPostWithContext from './components/views/Post/EditPost';
+import EditCommentWithContext from './components/views/Comment/EditComment';
 import PendingWithUserContext from './components/views/User/Pending';
 
 import { UserProvider, defaultUserState } from './components/contexts/UserContext';
@@ -118,24 +118,23 @@ class App extends Component {
 						} />
 						<PrivateRoute path="/post/create" exact render={(props) =>
 							<WithFormCreatePost
-								request={App.postService.postCreate}
+								request={(p) => App.postService.postCreate(p)}
 								validateForm={validateCreatePostForm}
 								{...props}
 							/>
 						} />
-						<Route path="/post/:postId" exact render={(props) =>
+						<Route path="/post/details/:postId" exact render={(props) =>
 							<PostDetailsWithUserContext
 								{...props}
 							/>
 						} />
 						<PrivateRoute path="/post/update/:postId" exact render={(props) =>
-							<EditPost
-								validateForm={validateCreatePostForm}
+							<EditPostWithContext
 								{...props}
 							/>
 						} />
 						<Route path="/comment/update/:commentId" exact render={(props) =>
-							<EditComment
+							<EditCommentWithContext
 								{...props}
 							/>
 						} />

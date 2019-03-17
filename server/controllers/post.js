@@ -19,10 +19,14 @@ function validatePost(req, res) {
 
 module.exports = {
 	getApprovedPosts: (req, res, next) => {
+		let limit = Math.abs(req.query.limit) || 9;
+		let page = (Math.abs(req.query.page) || 1) - 1;
 		Post
 			.find()
 			.where('status', 'Approved')
 			.populate('creator', 'username _id')
+			.limit(limit)
+			.skip(limit * page)
 			.then((posts) => {
 				res
 					.status(200)
@@ -119,13 +123,16 @@ module.exports = {
 					throw error;
 				}
 
+				let comms = post.comments;
+
 				return Promise.all([
+					User.updateMany({}, { '$pull': { 'comments': { '$in': comms } } }),
 					Post.findByIdAndDelete(postId),
 					Comment.deleteMany({post: postId}),
-					User.findById(post.creator)
+					User.findById(post.creator),
 				]);
 			})
-			.then(([p, c, u]) => {
+			.then(async ([uU, p, c, u]) => {
 				u.posts.pull(p._id);
 				return u.save();
 			})
@@ -206,9 +213,21 @@ module.exports = {
 						throw error;
 					}
 
+					if (p.title === title && p.content === content && p.imageUrl === imageUrl) {
+						const error = new Error('You didn\'t edit anything...');
+						error.statusCode = 422;
+						throw error;
+					}
+
 					p.title = title;
 					p.content = content;
 					p.imageUrl = imageUrl;
+
+					if (user.roles.indexOf('Admin') < 0) {
+						p.status = 'Pending';
+					} else {
+						p.status = 'Approved';
+					}
 
 					return p.save();
 				})

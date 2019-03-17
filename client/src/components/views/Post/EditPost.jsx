@@ -7,6 +7,9 @@ import notify from '../../../helpers/data/notifier';
 import PostService from '../../../services/post';
 import withError from '../../hocs/WithError';
 import ServerNotResponding from '../Issue/SeverNotResponding';
+import { UserConsumer } from '../../contexts/UserContext';
+
+import validateForm from '../../../helpers/formValidators/createPostValidator';
 
 class EditPost extends Component {
     constructor(props) {
@@ -18,7 +21,6 @@ class EditPost extends Component {
             imageUrl: '',
             error: {},
             isAuthor: true,
-            isAdmin: true,
             hasServerIssue: false,
         }
 
@@ -37,10 +39,10 @@ class EditPost extends Component {
     async handleFormSubmit(e) {
         e.preventDefault();
 
-        const { error, isAuthor, isAdmin, ...rest } = this.state;
+        const { error, isAuthor, hasServerIssue, ...rest } = this.state;
         const post = rest;
 
-        let validationResult = this.props.validateForm(post);
+        let validationResult = validateForm(post);
 
         if (!validationResult.success) {
             notify('error', validationResult.message, validationResult.errors);
@@ -67,8 +69,13 @@ class EditPost extends Component {
                 }
                 
             } else {
+                const prevPath = this.props.location.state.prevPath;
                 notify('success', res.message);
-                this.props.history.push('/');
+                if (this.props.isAdmin) {
+                    this.props.history.push(prevPath);
+                } else {
+                    this.props.history.push('/');
+                }
             }
         }
         catch (err) {
@@ -83,26 +90,28 @@ class EditPost extends Component {
             .getById(postId)
             .then(data => {
                 const isAuthor = data.post.creator._id === localStorage.getItem('userId') ? true : false;
-                const isAdmin = localStorage.getItem('isAdmin') === 'true';
                 this.setState({
                     title: data.post.title,
                     content: data.post.content,
                     imageUrl: data.post.imageUrl,
                     isAuthor,
-                    isAdmin,
                 })
             })
             .catch(err => console.log(err));
     }
     
     render() {
-        const { isAuthor, isAdmin, hasServerIssue } = this.state;
+        const { isAuthor, hasServerIssue, title, content, imageUrl } = this.state;
+        const { isAdmin } = this.props;
+
         if (!isAuthor && !isAdmin) {
             return <Redirect to="/user/login" />
         }
+
         if (hasServerIssue) {
             return <ServerNotResponding />;
         }
+
         return (
             <div className="container">
                 <h1>Edit Post</h1>
@@ -110,7 +119,7 @@ class EditPost extends Component {
                     <Input
                         inputType="input"
                         name="title"
-                        value={this.state.title}
+                        value={title}
                         onChange={this.handleChange}
                         label="Title"
                     />
@@ -118,23 +127,49 @@ class EditPost extends Component {
                         inputType={false}
                         name="content"
                         type="text"
-                        value={this.state.content}
+                        value={content}
                         onChange={this.handleChange}
                         label="Content"
                     />
                     <Input
-                    inputType="input"
-                    name="imageUrl"
-                    value={this.state.imageUrl}
-                    onChange={this.handleChange}
-                    label="ImageUrl"
-                />
+                        inputType="input"
+                        name="imageUrl"
+                        value={imageUrl}
+                        onChange={this.handleChange}
+                        label="ImageUrl"
+                    />
                     <br/>
-                    <input type="submit" className="btn btn-primary" value="Edit Post" />
+                    {
+                        isAdmin
+                        ? (
+                            <input type="submit" className="btn btn-primary" value="Edit and Approve" />
+                        ) : (
+                            <input type="submit" className="btn btn-primary" value="Edit Post" />
+                        )
+                    }
                 </form>
             </div>
         )
     }
 }
 
-export default withError(EditPost);
+//export default withError(EditPost);
+
+const WithErrorEditPost = withError(EditPost);
+
+const EditPostWithContext = (props) => {
+    return (
+        <UserConsumer>
+            {
+                (user) => (
+                    <WithErrorEditPost
+                        {...props}
+                        isAdmin={user.isAdmin}
+                    />
+                )
+            }
+        </UserConsumer>
+    )
+}
+
+export default EditPostWithContext;

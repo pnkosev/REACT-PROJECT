@@ -9,6 +9,7 @@ class Home extends Component {
         super(props);
         this.state = {
             posts: [],
+            hasNext: true,
             hasFetched: false,
             hasServerIssue: false,
         }

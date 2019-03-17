@@ -5,9 +5,9 @@ function validateForm(payload) {
     let isFormValid = true;
     let message = '';
 
-    if (!payload || typeof payload.username !== 'string' || payload.username.trim().length === 0) {
+    if (!payload || typeof payload.username !== 'string' || payload.username.trim().length < 4) {
         isFormValid = false;
-        errors.name = 'Please provide your username.';
+        errors.username = 'Please provide a valid username (atleast 4 letters/digits).';
     }
 
     if (!payload || typeof payload.email !== 'string' || !validator.isEmail(payload.email)) {

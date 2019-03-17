@@ -7,6 +7,7 @@ import ErrorBoundary from '../../hocs/ErrorBoundary';
 import PostService from '../../../services/post';
 import Post from '../Post/Post';
 import { UserConsumer } from '../../contexts/UserContext';
+import withError from '../../hocs/WithError';
 
 class Pending extends Component {
     constructor(props) {
@@ -31,8 +32,7 @@ class Pending extends Component {
     static commentService = new CommentService();
     static postService = new PostService();
 
-    async approveComment(e, id) {
-        e.preventDefault();
+    async approveComment(id) {
 
         try {
             let data = await Pending.commentService.approveComment(id);
@@ -50,8 +50,7 @@ class Pending extends Component {
         }
     }
 
-    async deleteComment(e, id) {
-        e.preventDefault();
+    async deleteComment(id) {
 
         try {
             let data = await Pending.commentService.deleteComment(id);
@@ -182,6 +181,7 @@ class Pending extends Component {
                             ? (
                                 posts.map(p => 
                                     <Post key={p._id}
+                                        {...this.props}
                                         author={p.creator.username}
                                         isAdmin={isAdmin}
                                         title={p.title}
@@ -189,8 +189,8 @@ class Pending extends Component {
                                         imageUrl={p.imageUrl}
                                         id={p._id}
                                         status={p.status}
-                                        deletePost={(e) => this.deletePost(e, p._id)}
-                                        approvePost={(e) => this.approvePost(e, p._id)}
+                                        deletePost={this.deletePost}
+                                        approvePost={this.approvePost}
                                     />)
                             ) : (
                                 <p>No posts to approve for now.</p>
@@ -208,14 +208,15 @@ class Pending extends Component {
                             ? (
                                 comments.map(c => 
                                     <Comment key={c._id}
+                                        {...this.props}
                                         author={c.creator.username}
                                         isAdmin={isAdmin}
                                         content={c.content}
                                         id={c._id}
                                         creatorId={c.creator._id}
                                         status={c.status}
-                                        deleteComment={(e) => this.deleteComment(e, c._id)}
-                                        approveComment={(e) => this.approveComment(e, c._id)}
+                                        deleteComment={this.deleteComment}
+                                        approveComment={this.approveComment}
                                     />)
                             ) : (
                                 <li>No comments to approve for now.</li>
@@ -244,4 +245,4 @@ const PendingWithUserContext = (props) => {
     )
 }
 
-export default PendingWithUserContext;
+export default withError(PendingWithUserContext);

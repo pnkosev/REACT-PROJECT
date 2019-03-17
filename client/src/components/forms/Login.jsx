@@ -84,9 +84,9 @@ import { UserConsumer } from '../contexts/UserContext';
 const LoginBase = (props) => {
     const { isLoggedIn } = props;
     if (isLoggedIn) {
-        return (
-            <Redirect to="/" />
-        );
+        // return (
+        //     <Redirect to="/" />
+        // );
     }
     return (
         <div className="container">

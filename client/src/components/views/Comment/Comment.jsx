@@ -4,13 +4,14 @@ import { NavLink } from 'react-router-dom';
 import '../../../styles/comment.css';
 
 
-const Comment = ({ content, author, id, creatorId, status, isAdmin, deleteComment, approveComment }) => {
+const Comment = (props) => {
+    const { content, author, id, creatorId, status, isAdmin, deleteComment, approveComment } = props;
     return (
         <li className="comment" key={id}>
             <p>{content}</p>
             <p className="author">Author: {author}</p>
             {
-                (creatorId.toString() === localStorage.getItem('userId') && !isAdmin)
+                (creatorId === localStorage.getItem('userId') && !isAdmin)
                 ? (
                     <button  onClick={() => deleteComment(id)}>Delete</button>
                 ) : (
@@ -25,14 +26,25 @@ const Comment = ({ content, author, id, creatorId, status, isAdmin, deleteCommen
                         status === 'Pending'
                         ? (
                             <Fragment>
-                                <button onClick={(e) => approveComment(e, id)}>Approve</button>
-                                <button onClick={(e) => deleteComment(e, id)}>Delete</button>
-                                <NavLink to={`/comment/update/${id}`} activeClassName="active" className="btn" >Edit</NavLink>
+                                <button onClick={() => approveComment(id)}>Approve</button>
+                                <button onClick={() => deleteComment(id)}>Delete</button>
+                                <NavLink
+                                    to={{pathname: `/comment/update/${id}`, state: { prevPath: props.location.pathname }}}
+                                    activeClassName="active"
+                                    className="btn" 
+                                >
+                                    Edit
+                                </NavLink>
                             </Fragment>
                         ) : (
                             <Fragment>
-                                <button onClick={(e) => deleteComment(e, id)}>Delete</button>
-                                <NavLink to={`/comment/update/${id}`} activeClassName="active" className="btn" >Edit</NavLink>
+                                <button onClick={() => deleteComment(id)}>Delete</button>
+                                <NavLink to={{pathname: `/comment/update/${id}`, state: { prevPath: props.location.pathname }}}
+                                    activeClassName="active"
+                                    className="btn" 
+                                >
+                                    Edit
+                                </NavLink>
                             </Fragment>
                         )
                     }

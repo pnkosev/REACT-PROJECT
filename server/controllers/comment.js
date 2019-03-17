@@ -18,42 +18,68 @@ function validateComment(req, res) {
 }
 
 module.exports = {
-	postCreateComment: (req, res, next) => {
+	postCreateComment: async (req, res, next) => {
 		if (validateComment(req, res)) {
 			const postId = req.params.postId;
 			const { content } = req.body;
 
+			const user = await User.findById(req.userId);
+			
+			let status = 'Pending';
+
+			let isAdmin;
+			if (user.roles.indexOf('Admin') !== -1) {
+				status = 'Approved';
+				isAdmin = true;
+			}
+
 			const comment = new Comment({
 				content,
                 creator: req.userId,
-                post: postId,
+				post: postId,
+				status,
             });
             
-			comment.save()
-				.then(() => {
-					return Promise.all([User.findById(req.userId), Post.findById(postId)]);
-				})
-				.then(([user, post]) => {
-                    user.comments.push(comment);
-                    post.comments.push(comment);
-					return Promise.all([user.save(), post.save()]);
-                })
-				.then(() => {
+			return comment.save()
+			.then(() => {
+				return Promise.all([User.findById(req.userId), Post.findById(postId)]);
+			})
+			.then(([user, post]) => {
+				user.comments.push(comment);
+				post.comments.push(comment);
+				return Promise.all([user.save(), post.save()]);
+			})
+			.then(() => {
+				return Comment
+						.findById(comment._id)
+						.populate('creator', 'username _id')
+			})
+			.then((c) => {
+				if (isAdmin) {
 					res
-						.status(201)
-						.json({
-							success: true,
-							message: 'Comment created successfully! It will be visible right after the approval of our Admins!',
-							comment,
-						})
-				})
-				.catch((error) => {
-					if (!error.statusCode) {
-						error.statusCode = 500;
-					}
+					.status(201)
+					.json({
+						success: true,
+						message: 'Comment created successfully!',
+						comment: c,
+					})
+				} else {
+					res
+					.status(201)
+					.json({
+						success: true,
+						message: 'Comment created successfully! It will be visible right after the approval of our Admins!',
+						comment: c,
+					})
+				}
+			})
+			.catch((error) => {
+				if (!error.statusCode) {
+					error.statusCode = 500;
+				}
 
-					next(error);
-				});
+				next(error);
+			});
 		}
 	},
 	getCommentById: (req, res, next) => {
@@ -100,7 +126,13 @@ module.exports = {
                         const error = new Error('Unauthorized');
                         error.statusCode = 403;
                         throw error;
-                    }
+					}
+					
+					if (comment.content === newComment.content) {
+						const error = new Error('You didn\'t edit anything...');
+                        error.statusCode = 422;
+                        throw error;
+					}
                     
 					comment.content = newComment.content;
 

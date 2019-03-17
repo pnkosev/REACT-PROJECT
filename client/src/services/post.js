@@ -4,9 +4,9 @@ const host = `http://localhost:9999/`;
 class PostService {
     constructor() {
         this.baseUrl = `${host}post/`;
-        this.getAllUrl = `${this.baseUrl}all`;
+        this.getAllUrl = `${this.baseUrl}all?page=`;
         this.getPendingUrl = `${this.baseUrl}pending`;
-        this.createUrl = `${this.baseUrl}create`;
+        this.createPostUrl = `${this.baseUrl}create`;
         this.updateUrl = `${this.baseUrl}update/`;
         this.approvePostUrl = `${this.baseUrl}approve/`
         this.deleteUrl = `${this.baseUrl}delete/`;
@@ -14,8 +14,8 @@ class PostService {
         this.hateUrl = `${this.baseUrl}hate/`;
     }
 
-    getAll() {
-        return get(this.getAllUrl);
+    getAll(page) {
+        return get(this.getAllUrl + page);
     }
 
     getPending() {
@@ -23,11 +23,11 @@ class PostService {
     }
 
     postCreate(p) {
-        return post(`${host}post/create`, p);
+        return post(this.createPostUrl, p);
     }
 
     getById(id) {
-        return get(this.baseUrl + id)
+        return get(this.baseUrl + '/details/' + id)
     }
 
     update(id, post) {

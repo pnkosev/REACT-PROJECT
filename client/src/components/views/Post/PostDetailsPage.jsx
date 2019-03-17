@@ -7,6 +7,7 @@ import ErrorBoundary from '../../hocs/ErrorBoundary';
 import CommentService from '../../../services/comment';
 import { UserConsumer } from '../../contexts/UserContext';
 import PostSection from './PostSection';
+import commentValidateForm from '../../../helpers/formValidators/commentValidator';
 
 class PostDetails extends Component {
     constructor(props) {
@@ -24,28 +25,41 @@ class PostDetails extends Component {
         this.likePost = this.likePost.bind(this);
         this.hatePost = this.hatePost.bind(this);
         this.deleteComment = this.deleteComment.bind(this);
+
+        this.updateComms = this.updateComms.bind(this);
+        //this.postComment = this.postComment.bind(this);
     }
 
     static postService = new PostService();
     static commentService = new CommentService();
 
-    async deletePost(id) {
-        try {
-            PostDetails.postService
-                .remove(id)
-                .then((res) => {
-                    if (!res.success) {
-                        notify('error', res.message);
-                        return;
-                    } else {
-                        notify('success', res.message)
-                        this.props.history.push('/');
-                    }
-                })
-        } catch (err) {
-            console.log(err);
-            this.setState({ hasServerIssue: true });
+    // async postComment(creds, id) {
+    //     return await PostDetails.commentService.postComment(creds, id);
+    // }
+
+    updateComms(res) {
+        if (res.comment.status === 'Approved') {
+            this.setState({
+                comments: [...this.state.comments, res.comment]
+            })
         }
+    }
+
+    deletePost(id) {
+        PostDetails.postService
+            .remove(id)
+            .then((res) => {
+                if (!res.success) {
+                    throw new Error(res.message);
+                } else {
+                    notify('success', res.message)
+                    this.props.history.push('/');
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({ hasServerIssue: true });
+            });
     }
 
     async likePost(id) {
@@ -91,8 +105,7 @@ class PostDetails extends Component {
             let data = await PostDetails.commentService.deleteComment(id);
 
             if (!data.success) {
-                notify('error', data.message);
-                return;
+                throw new Error(data.message);
             } else {
                 this.setState({ comments })
                 notify('success', data.message);
@@ -105,19 +118,20 @@ class PostDetails extends Component {
     }
 
     componentDidMount() {
+        const { isLoggedIn } = this.props;
         const postId = this.props.match.params.postId;
         PostDetails.postService
             .getById(postId)
             .then(data => {
                 let isAuthor;
-                if (localStorage.getItem('userId')) {
+                if (isLoggedIn) {
                     isAuthor = data.post.creator._id === localStorage.getItem('userId') ? true : false;
                 }
                 this.setState({
                     post: data.post,
-                    hasFetched: true,
                     isAuthor,
                     comments: data.post.comments,
+                    hasFetched: true,
                 })
             })
             .catch(err => {
@@ -142,23 +156,28 @@ class PostDetails extends Component {
                         ? (<h2>Loading...</h2>)
                         : (<Fragment>
                             <PostSection
+                                {...this.props}
                                 post={post}
                                 isAuthor={isAuthor}
                                 isAdmin={isAdmin}
                                 isLoggedIn={isLoggedIn}
-                                deletePost={() => this.deletePost(post._id)}
-                                likePost={() => this.likePost(post._id)}
-                                hatePost={() => this.hatePost(post._id)}
+                                deletePost={this.deletePost}
+                                likePost={this.likePost}
+                                hatePost={this.hatePost}
                             />
                             {
                                 isLoggedIn
                                     ? (
                                         <ErrorBoundary>
                                             <CommentSection
+                                                {...this.props}
                                                 isAdmin={isAdmin}
                                                 postId={post._id}
                                                 comments={comments}
-                                                deleteComment={(id) => this.deleteComment(id)}
+                                                deleteComment={this.deleteComment}
+                                                postComment={(creds, id) => PostDetails.commentService.postComment(creds, id)}
+                                                updateComms={(res) => this.updateComms(res)}
+                                                validateForm={commentValidateForm}
                                             />
                                         </ErrorBoundary>
                                     ) : (

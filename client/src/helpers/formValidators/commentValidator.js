@@ -3,9 +3,9 @@ function validateForm(payload) {
 	let isFormValid = true;
 	let message = '';
 
-	if (!payload || typeof payload.content !== 'string' || payload.content.trim().length === 0) {
+	if (!payload || typeof payload.content !== 'string' || payload.content.trim().length < 10) {
 		isFormValid = false;
-		errors.name = 'Please fill the content field.';
+		errors.content = 'Please fill out the content field (minimum 10 symbols).';
 	}
 
 	if (!isFormValid) {

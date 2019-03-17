@@ -25,7 +25,7 @@ router.post('/create', [
 ],
 isAuth, postController.postCreatePost);
 
-router.get('/:postId', postController.getPostById);
+router.get('/details/:postId', postController.getPostById);
 
 router.put('/update/:postId', [
   body('title')
