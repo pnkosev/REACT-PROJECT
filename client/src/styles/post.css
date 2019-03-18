@@ -3,6 +3,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    margin: 1.5rem 0 1.5rem 0;
 }
 
 .post-card {
@@ -86,4 +87,8 @@
 .post-card .content a:hover {
     background: lavender;
     color: rgb(150, 0, 150);
+}
+
+div.pagination-btns {
+    text-align: center;
 }

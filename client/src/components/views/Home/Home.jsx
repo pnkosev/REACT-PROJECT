@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PostService from '../../../services/post';
 import ServerNotResponding from '../Issue/SeverNotResponding';
 import withError from '../../hocs/WithError';
@@ -10,28 +10,35 @@ class Home extends Component {
         super(props);
         this.state = {
             posts: [],
-            hasLast: 0,
-            hasNext: true,
+            page: 1,
+            hasLast: false,
+            hasNext: false,
             hasFetched: false,
             hasServerIssue: false,
         }
-
-        this.getData = this.getData.bind(this);
     }
 
     static postServices = new PostService();
 
-    async getData() {
+    setPage = (step) => {
+        this.setState((prevState) => ({
+            page: prevState.page + step,
+        }));
+    };
+
+    async getData(page) {
         try {
-            let data = await Home.postServices.getAll();
+            let data = await Home.postServices.getAll(page);
             if (!data.success) {
                 throw new Error(data.message);
             } else {
-                let hasNext = data.posts < 9 ? false : true;
+                let hasNext = data.posts.length === 6;
+                let hasLast = this.state.page > 1;
                 this.setState({
                     posts: data.posts,
                     hasFetched: true,
-                    hasNext
+                    hasNext,
+                    hasLast,
                 });
             }
         } catch (err) {
@@ -42,7 +49,18 @@ class Home extends Component {
     }
 
     componentDidMount() {
-        this.getData();
+        const { page } = this.state;
+        this.getData(page);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        const { page: currentPage } = this.state;
+        const { page: lastPage } = prevState;
+
+        if (currentPage !== lastPage) {
+            console.log('no infinite loop yo!');
+            this.getData(currentPage);
+        }
     }
 
     render() {
@@ -62,29 +80,75 @@ class Home extends Component {
                             <h2>Loading...</h2>
                         ) : (
                             <ErrorBoundary>
-                                <div>Posts:</div>
-                                <div className="cards-layout flex">
+                                <div className="pagination-btns">
                                     {
-                                        posts.length
-                                            ? posts.map(p => (
-                                                <Post key={p._id}
-                                                    title={p.title}
-                                                    content={p.content}
-                                                    imageUrl={p.imageUrl}
-                                                    id={p._id}
-                                                    author={p.creator.username}
-                                                />))
-                                            : <h2>Currently no posts...</h2>
+                                        hasLast
+                                        ? (
+                                            <button className="last-btn" onClick={() => this.setPage(-1)}>Last</button>
+                                        ) : (
+                                            null
+                                        )
+                                    }
+                                    {
+                                        hasNext
+                                        ? (
+                                            <button className="nxt-btn" onClick={() => this.setPage(1)}>Next</button>
+                                        ) : (
+                                            null
+                                        )
                                     }
                                 </div>
                                 {
-                                    hasLast === true && (
-                                        <button className="last-btn" onClick={this.getData}>Next</button>
-                                    )
+                                    posts.length
+                                        ? (
+                                            <Fragment>
+                                                <div className="cards-layout flex">
+                                                    {posts.map(p => (
+                                                    <Post key={p._id}
+                                                        title={p.title}
+                                                        content={p.content}
+                                                        imageUrl={p.imageUrl}
+                                                        id={p._id}
+                                                        author={p.creator.username}
+                                                    />))}
+                                                </div>
+                                            </Fragment>
+                                        ) : (
+                                            <Fragment>
+                                            {
+                                                hasLast 
+                                                ? (
+                                                    <h3>THE END :)</h3>
+                                                ) : (
+                                                    <h3>Currently no posts...</h3>
+                                                )
+                                            }
+                                            </Fragment>
+                                        )
                                 }
                                 {
-                                    hasNext === true && (
-                                        <button className="nxt-btn" onClick={this.getData}>Next</button>
+                                    posts.length
+                                    ? (
+                                        <div className="pagination-btns">
+                                            {
+                                                hasLast
+                                                ? (
+                                                    <button className="last-btn" onClick={() => this.setPage(-1)}>Last</button>
+                                                ) : (
+                                                    null
+                                                )
+                                            }
+                                            {
+                                                hasNext
+                                                ? (
+                                                    <button className="nxt-btn" onClick={() => this.setPage(1)}>Next</button>
+                                                ) : (
+                                                    null
+                                                )
+                                            }
+                                        </div>
+                                    ) : (
+                                        null
                                     )
                                 }
                             </ErrorBoundary>

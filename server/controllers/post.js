@@ -19,7 +19,7 @@ function validatePost(req, res) {
 
 module.exports = {
 	getApprovedPosts: (req, res, next) => {
-		let limit = Math.abs(req.query.limit) || 9;
+		let limit = Math.abs(req.query.limit) || 6;
 		let page = (Math.abs(req.query.page) || 1) - 1;
 		Post
 			.find()
