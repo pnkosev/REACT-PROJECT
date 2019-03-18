@@ -36,6 +36,9 @@ class Pending extends Component {
     static postService = new PostService();
 
     async approveComment(id) {
+        // let comments = this.state.comments.slice();
+        // let index = comments.findIndex(c => c._id === id);
+        // comments.splice(index, 1);
 
         try {
             let data = await Pending.commentService.approveComment(id);
@@ -43,9 +46,8 @@ class Pending extends Component {
             if (!data.success) {
                 notify('error', data.message);
             } else {
-                this.setState({ haveCommentsChanged: true, });
+                this.setState({ haveCommentsChanged: !this.state.haveCommentsChanged, });
                 notify('success', data.message);
-                //this.getPendingComments();
             }
         }   catch(err) {
             this.setState({ hasServerIssue: true });
@@ -54,6 +56,9 @@ class Pending extends Component {
     }
 
     async deleteComment(id) {
+        // let comments = this.state.comments.slice();
+        // let index = comments.findIndex(c => c._id === id);
+        // comments.splice(index, 1);
 
         try {
             let data = await Pending.commentService.deleteComment(id);
@@ -61,8 +66,7 @@ class Pending extends Component {
             if (!data.success) {
                 notify('error', data.message);
             } else {
-                this.setState({ haveCommentsChanged: true, });
-                //this.getPendingComments();
+                this.setState({ haveCommentsChanged: !this.state.haveCommentsChanged, });
                 notify('success', data.message);
             }
         } catch(err) {
@@ -80,7 +84,6 @@ class Pending extends Component {
             } else {
                 this.setState({
                     comments: data.comments,
-                    haveCommentsChanged: false,
                     hasFetched: true,
                 });
             }
@@ -99,7 +102,6 @@ class Pending extends Component {
             } else {
                 this.setState({
                     posts: data.posts,
-                    havePostsChanged: false,
                     hasFetched: true,
                 });
             }
@@ -118,9 +120,8 @@ class Pending extends Component {
             if (!data.success) {
                 notify('error', data.message);
             } else {
-                this.setState({ havePostsChanged: true, });
+                this.setState({ havePostsChanged: !this.state.havePostsChanged, });
                 notify('success', data.message);
-                //this.getPendingPosts();
             }
         }   catch(err) {
             this.setState({ hasServerIssue: true });
@@ -136,8 +137,7 @@ class Pending extends Component {
             if (!data.success) {
                 notify('error', data.message);
             } else {
-                this.setState({ havePostsChanged: true, });
-                //this.getPendingPosts();
+                this.setState({ havePostsChanged: !this.state.havePostsChanged, });
                 notify('success', data.message);
             }
         } catch(err) {

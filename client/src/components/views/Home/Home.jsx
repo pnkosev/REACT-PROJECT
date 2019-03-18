@@ -102,6 +102,7 @@ class Home extends Component {
                                     posts.length
                                         ? (
                                             <Fragment>
+                                                <h2>Posts:</h2>
                                                 <div className="cards-layout flex">
                                                     {posts.map(p => (
                                                     <Post key={p._id}
