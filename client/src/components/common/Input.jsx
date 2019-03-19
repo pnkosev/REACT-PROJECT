@@ -3,7 +3,7 @@ import React, { Fragment } from 'react';
 import '../../styles/input.css';
 
 const Input = (props) => {
-    const { inputType, name, type = 'text', value, onChange, label } = props;
+    const { inputType, name, type = 'text', value, onChange, label, placeholder } = props;
     return (
         <Fragment>
             <label htmlFor={name}>{label}</label> <br/>
@@ -15,7 +15,8 @@ const Input = (props) => {
                         name={name}
                         id={name}
                         type={type}
-                        value={value} 
+                        value={value}
+                        placeholder={placeholder}
                     />
                 ) : (
                     <textarea
@@ -24,7 +25,7 @@ const Input = (props) => {
                         id={name}
                         type={type}
                         value={value}
-                        placeholder="Remember, be nice!"
+                        placeholder={placeholder}
                     />
                 )
             }

@@ -15,6 +15,7 @@ const CreatePost = (props) => {
                     value={props.title}
                     onChange={props.handleChange}
                     label="Title"
+                    placeholder="Title"
                 />
                 <Input
                     inputType={false}
@@ -23,6 +24,7 @@ const CreatePost = (props) => {
                     value={props.content}
                     onChange={props.handleChange}
                     label="Content"
+                    placeholder="Type something clever here!"
                 />
                 <Input
                     inputType="input"
@@ -30,6 +32,7 @@ const CreatePost = (props) => {
                     value={props.imageUrl}
                     onChange={props.handleChange}
                     label="ImageUrl"
+                    placeholder="https://image.jpeg"
                 />
                 <br/>
                 <input type="submit" className="btn btn-primary" value="Create Post" />

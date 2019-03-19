@@ -1,12 +1,12 @@
 import React from 'react';
 
 import Comment from './Comment';
-import WithFormCreateComment from '../../forms/CreateComment';
-import ServerNotResponding from '../Issue/SeverNotResponding';
-import ErrorBoundary from '../../hocs/ErrorBoundary';
-import withError from '../../hocs/WithError';
+import WithFormCreateComment from '../forms/CreateComment';
+import ServerNotResponding from '../views/Issue/SeverNotResponding';
+import ErrorBoundary from '../hocs/ErrorBoundary';
+import withError from '../hocs/WithError';
 
-import '../../../styles/comment-section.css';
+import '../../styles/comment-section.css';
 
 const CommentSection = (props) => {
     const { isAdmin, comments, deleteComment, postId, postComment, updateComms, validateForm, serverIssue } = props;

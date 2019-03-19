@@ -1,11 +1,11 @@
 import React, { Component, Fragment } from 'react';
 import PostService from '../../../services/post';
 import notify from '../../../helpers/data/notifier';
-import CommentSection from '../Comment/CommentSection';
+import CommentSection from '../../comment/CommentSection';
 import ServerNotResponding from '../Issue/SeverNotResponding';
 import CommentService from '../../../services/comment';
 import { UserConsumer } from '../../contexts/UserContext';
-import PostSection from './PostSection';
+import PostSection from '../../post/PostSection';
 import commentValidateForm from '../../../helpers/formValidators/commentValidator';
 
 class PostDetails extends Component {

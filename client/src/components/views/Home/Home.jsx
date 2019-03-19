@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PostService from '../../../services/post';
 import ServerNotResponding from '../Issue/SeverNotResponding';
 import withError from '../../hocs/WithError';
-import Post from '../Post/Post';
+import Post from '../../post/Post';
 import ErrorBoundary from '../../hocs/ErrorBoundary';
 
 class Home extends Component {
@@ -84,7 +84,7 @@ class Home extends Component {
                                     {
                                         hasLast
                                         ? (
-                                            <button className="last-btn" onClick={() => this.setPage(-1)}>Last</button>
+                                            <button className="last-btn" onClick={() => this.setPage(-1)}>Last Page</button>
                                         ) : (
                                             null
                                         )
@@ -92,7 +92,7 @@ class Home extends Component {
                                     {
                                         hasNext
                                         ? (
-                                            <button className="nxt-btn" onClick={() => this.setPage(1)}>Next</button>
+                                            <button className="nxt-btn" onClick={() => this.setPage(1)}>Next Page</button>
                                         ) : (
                                             null
                                         )
@@ -134,7 +134,7 @@ class Home extends Component {
                                             {
                                                 hasLast
                                                 ? (
-                                                    <button className="last-btn" onClick={() => this.setPage(-1)}>Last</button>
+                                                    <button className="last-btn" onClick={() => this.setPage(-1)}>Last Page</button>
                                                 ) : (
                                                     null
                                                 )
@@ -142,7 +142,7 @@ class Home extends Component {
                                             {
                                                 hasNext
                                                 ? (
-                                                    <button className="nxt-btn" onClick={() => this.setPage(1)}>Next</button>
+                                                    <button className="nxt-btn" onClick={() => this.setPage(1)}>Next Page</button>
                                                 ) : (
                                                     null
                                                 )

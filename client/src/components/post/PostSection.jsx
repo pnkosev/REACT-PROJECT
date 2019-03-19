@@ -1,10 +1,10 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import withError from '../../hocs/WithError';
+import withError from '../hocs/WithError';
 
-import '../../../styles/post-section.css';
-import ServerNotResponding from '../Issue/SeverNotResponding';
+import '../../styles/post-section.css';
+import ServerNotResponding from '../views/Issue/SeverNotResponding';
 
 const PostSection = (props) => {
     const { post, isAuthor, isAdmin, isLoggedIn, deletePost, likePost, hatePost, serverIssue } = props;

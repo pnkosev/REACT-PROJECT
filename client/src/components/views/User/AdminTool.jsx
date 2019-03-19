@@ -9,10 +9,10 @@ import withError from '../../hocs/WithError';
 import ErrorBoundary from '../../hocs/ErrorBoundary';
 
 import ServerNotResponding from '../Issue/SeverNotResponding';
-import Comment from '../Comment/Comment';
-import Post from '../Post/Post';
+import Comment from '../../comment/Comment';
+import Post from '../../post/Post';
 
-class Pending extends Component {
+class AdminTool extends Component {
     constructor(props) {
         super(props);
 
@@ -41,7 +41,7 @@ class Pending extends Component {
         // comments.splice(index, 1);
 
         try {
-            let data = await Pending.commentService.approveComment(id);
+            let data = await AdminTool.commentService.approveComment(id);
 
             if (!data.success) {
                 notify('error', data.message);
@@ -61,7 +61,7 @@ class Pending extends Component {
         // comments.splice(index, 1);
 
         try {
-            let data = await Pending.commentService.deleteComment(id);
+            let data = await AdminTool.commentService.deleteComment(id);
 
             if (!data.success) {
                 notify('error', data.message);
@@ -77,7 +77,7 @@ class Pending extends Component {
 
     async getPendingComments() {
         try {
-            let data = await Pending.commentService.getPendingComments();
+            let data = await AdminTool.commentService.getPendingComments();
 
             if (!data.success) {
                 notify('error', data.message);
@@ -95,7 +95,7 @@ class Pending extends Component {
 
     async getPendingPosts() {
         try {
-            let data = await Pending.postService.getPending();
+            let data = await AdminTool.postService.getPending();
 
             if (!data.success) {
                 notify('error', data.message);
@@ -115,7 +115,7 @@ class Pending extends Component {
         e.preventDefault();
 
         try {
-            let data = await Pending.postService.approvePost(id);
+            let data = await AdminTool.postService.approvePost(id);
 
             if (!data.success) {
                 notify('error', data.message);
@@ -132,7 +132,7 @@ class Pending extends Component {
     async deletePost(e, id) {
         e.preventDefault();
         try {
-            let data = await Pending.postService.remove(id);
+            let data = await AdminTool.postService.remove(id);
 
             if (!data.success) {
                 notify('error', data.message);
@@ -233,12 +233,12 @@ class Pending extends Component {
     }
 }
 
-const PendingWithUserContext = (props) => {
+const AdminToolWithUserContext = (props) => {
     return (
         <UserConsumer>
             {
                 (user) => (
-                    <Pending
+                    <AdminTool
                         {...props}
                         isAdmin={user.isAdmin}
                     />
@@ -248,4 +248,4 @@ const PendingWithUserContext = (props) => {
     )
 }
 
-export default withError(PendingWithUserContext);
+export default withError(AdminToolWithUserContext);

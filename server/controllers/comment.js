@@ -133,7 +133,13 @@ module.exports = {
                         error.statusCode = 422;
                         throw error;
 					}
-                    
+					
+					if (user.roles.indexOf('Admin') < 0) {
+						comment.status = 'Pending';
+					} else {
+						comment.status = 'Approved';
+					}
+					
 					comment.content = newComment.content;
 
 					return comment.save();

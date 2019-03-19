@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { NavLink } from 'react-router-dom';
 
-import '../../../styles/comment.css';
+import '../../styles/comment.css';
 
 
 const Comment = (props) => {

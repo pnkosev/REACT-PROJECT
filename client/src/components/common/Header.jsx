@@ -9,7 +9,7 @@ class Header extends Component {
 
         return (
             <header className="nav">
-                <p className="title">Blog System</p>
+                <p className="title">Social Blog</p>
                 {username ? <p className="welcome-msg">Welcome, {username}</p> : null }
                 <nav>
                     {
@@ -20,7 +20,7 @@ class Header extends Component {
                                         isAdmin
                                         ? (
                                             <li>
-                                                <NavLink exact to="/user/admin/work" activeClassName="active">Work-work</NavLink>
+                                                <NavLink exact to="/user/adminTool" activeClassName="active">Admin Tool</NavLink>
                                             </li>
                                         ) : (
                                             null

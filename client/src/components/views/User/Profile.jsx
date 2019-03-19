@@ -5,7 +5,7 @@ import { getProfile } from '../../../services/auth';
 import withError from '../../hocs/WithError';
 
 import ServerNotResponding from '../Issue/SeverNotResponding';
-import Post from '../Post/Post';
+import Post from '../../post/Post';
 import { UserConsumer } from '../../contexts/UserContext';
 
 class Profile extends Component {

@@ -15,6 +15,7 @@ const CreateComment = (props) => {
                     value={props.content}
                     onChange={props.handleChange}
                     label="Content"
+                    placeholder="Remember, be nice!"
                 />
                 <br/>
                 <input type="submit" className="btn btn-primary" value="Comment" />

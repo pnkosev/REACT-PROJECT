@@ -29,7 +29,7 @@ import WithFormLogin from './components/forms/Login';
 import WithFormCreatePost from './components/forms/CreatePost';
 import EditPostWithContext from './components/views/Post/EditPost';
 import EditCommentWithContext from './components/views/Comment/EditComment';
-import PendingWithUserContext from './components/views/User/Pending';
+import AdminToolWithUserContext from './components/views/User/AdminTool';
 
 toastr.options.newestOnTop = false;
 toastr.options.closeButton = true;
@@ -103,8 +103,8 @@ class App extends Component {
 								{...props}
 							/>
 						} />
-						<AdminRouteWithUserContext path="/user/admin/work" exact render={(props) =>
-							<PendingWithUserContext {...props} />
+						<AdminRouteWithUserContext path="/user/adminTool" exact render={(props) =>
+							<AdminToolWithUserContext {...props} />
 						} />
 						<PrivateRouteWithUserContext path="/post/create" exact render={(props) =>
 							<WithFormCreatePost
