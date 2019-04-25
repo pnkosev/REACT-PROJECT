@@ -6,8 +6,8 @@ SoftUni2019
 ## Design
 The app has the following structure:
 * Guests (anonymous users) are:
-	* allowed to the home page and see the all the posts
-	* allowed to see a some of the details of the post
+	* allowed to the home page and see all the posts
+	* allowed to the details page of each post, however with some restrictions and limitations
 	* not allowed to post/comment
 * Users can:
 	* create posts
