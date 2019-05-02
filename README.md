@@ -1,7 +1,7 @@
 # REACT-PROJECT
 SoftUni2019
 
-## BLOG/FORUM (go figure)
+## BLOG/FORUM
 
 ## Design
 The app has the following structure:
